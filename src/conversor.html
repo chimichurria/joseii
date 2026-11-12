@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convertí tu PowerPoint en una charla en vivo</title>
+<meta name="description" content="Arrastrá tu .pptx y descargá una presentación HTML animada, con votaciones en vivo opcionales. Todo pasa en tu navegador.">
+<style>
+:root{color-scheme:light;--c1:#FF3300;--c2:#FF9900;--gray:#5f6a6e;--steel:#485458;--ink:#1B1F21;--line:#E2E6E8;--suave:#F6F7F8;--ease:cubic-bezier(.2,.75,.2,1);--mono:Consolas,"SF Mono",Menlo,"Courier New",monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#fff}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--ink);line-height:1.5;min-height:100vh;background:
+  radial-gradient(620px 420px at -6% -8%,rgba(255,51,0,.13),transparent 70%),
+  radial-gradient(560px 420px at 106% 4%,rgba(255,153,0,.14),transparent 70%),#fff;background-repeat:no-repeat}
+.pagina{max-width:1080px;margin:0 auto;padding:48px 24px 64px}
+.kicker{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--c1);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.kicker::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--c1);box-shadow:0 0 10px var(--c1)}
+h1{font-size:clamp(34px,5.4vw,58px);line-height:1.06;letter-spacing:-.02em;max-width:17ch;text-wrap:balance}
+.grad{background:linear-gradient(90deg,var(--c1),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.bajada{font-size:clamp(17px,2vw,20px);color:var(--gray);max-width:60ch;margin-top:16px}
+h2{font-size:22px;letter-spacing:-.01em;margin-bottom:6px}
+.soltar{margin-top:34px;border:2px dashed rgba(72,84,88,.35);border-radius:24px;background:rgba(255,255,255,.75);padding:44px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .2s var(--ease)}
+.soltar:hover,.soltar:focus-visible,.soltar.sobre{border-color:var(--c1);background:rgba(255,51,0,.04);outline:none}
+.soltar.sobre{transform:scale(1.01)}
+.soltar strong{display:block;font-size:22px}
+.soltar span{display:block;color:var(--gray);margin-top:6px;font-size:16px}
+.soltar .archivo{margin-top:14px;font-family:var(--mono);font-size:14px;color:var(--steel);font-weight:700}
+.privado{margin-top:12px;font-size:14px;color:var(--gray);text-align:center}
+.columnas{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:28px;margin-top:34px;align-items:start}
+.caja{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 12px 36px rgba(72,84,88,.08)}
+.campo{margin-top:20px}
+.campo>label,.campo>.rotulo{display:block;font-size:14px;font-weight:700;margin-bottom:7px}
+.campo small{display:block;color:var(--gray);font-size:13.5px;margin-top:6px;line-height:1.45}
+input[type=text],input[type=url]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #C9D0D3;font:inherit;font-size:16px;color:var(--ink);background:#fff}
+input:focus-visible,button:focus-visible,.interruptor:focus-within{outline:3px solid rgba(255,51,0,.35);outline-offset:2px}
+.interruptor{display:flex;gap:14px;align-items:flex-start;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--suave);cursor:pointer}
+.interruptor input{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:14px;background:#C9D0D3;position:relative;cursor:pointer;transition:background .2s;margin-top:2px}
+.interruptor input::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s var(--ease);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.interruptor input:checked{background:linear-gradient(90deg,var(--c1),var(--c2))}
+.interruptor input:checked::after{transform:translateX(18px)}
+.interruptor b{display:block;font-size:16px}
+.interruptor span{display:block;font-size:14px;color:var(--gray);line-height:1.45;margin-top:2px}
+.detalle{display:none;margin-top:12px;padding:16px;border-radius:16px;border:1px solid rgba(255,51,0,.25);background:rgba(255,51,0,.035);font-size:14.5px;line-height:1.5}
+.detalle.on{display:block}
+.detalle ul{margin:8px 0 4px 18px}
+.detalle li{margin:4px 0}
+.detalle code,.pasos code{font-family:var(--mono);font-size:.94em;background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.opciones{display:flex;flex-wrap:wrap;gap:8px}
+.opciones label{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;border:1px solid #C9D0D3;font-size:14.5px;cursor:pointer;background:#fff}
+.opciones input{accent-color:var(--c1)}
+.opciones label:has(input:checked){border-color:var(--c1);box-shadow:0 0 0 3px rgba(255,51,0,.12)}
+.colores{display:none;gap:12px;margin-top:10px;align-items:center;font-size:14px}
+.colores.on{display:flex}
+.colores input{width:44px;height:36px;border:1px solid #C9D0D3;border-radius:10px;padding:2px;background:#fff;cursor:pointer}
+.boton{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 24px;border-radius:999px;border:0;background:linear-gradient(90deg,var(--c1),var(--c2));color:#fff;font:inherit;font-size:16.5px;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 10px 26px rgba(255,51,0,.26)}
+.boton.sec{background:#fff;color:var(--ink);border:1px solid #C9D0D3;box-shadow:none}
+.boton[aria-disabled=true]{opacity:.45;pointer-events:none;box-shadow:none}
+.acciones{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.marco{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--suave)}
+.marco iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.marco .vacio{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--gray);padding:24px;font-size:15.5px}
+.resumen{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--steel);margin-top:14px;min-height:21px}
+.avisos{list-style:none;margin-top:12px;display:none;flex-direction:column;gap:8px}
+.avisos.on{display:flex}
+.avisos li{font-size:14px;line-height:1.45;padding:10px 12px;border-radius:12px;background:#FFF6E5;border:1px solid #F4D9A6;color:#6B4A00}
+.error{display:none;margin-top:16px;padding:14px 16px;border-radius:14px;background:#FDECEA;border:1px solid #F3B8B1;color:#8A1C12;font-size:15px}
+.error.on{display:block}
+.pasos{margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.pasos div{padding:22px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.8)}
+.pasos b{display:block;font-family:var(--mono);color:var(--c1);font-size:14px;letter-spacing:.1em;margin-bottom:8px}
+.pasos h3{font-size:18px;margin-bottom:6px}
+.pasos p{font-size:14.5px;color:var(--gray);line-height:1.5}
+footer{margin-top:44px;font-size:14px;color:var(--gray);display:flex;gap:8px 20px;flex-wrap:wrap;justify-content:space-between}
+footer a{color:var(--steel);font-weight:700}
+@media (max-width:860px){.columnas{grid-template-columns:1fr}.pasos{grid-template-columns:1fr}.pagina{padding-top:32px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header>
+    <div class="kicker">Conversor · un solo archivo, sin instalar nada</div>
+    <h1>Tu PowerPoint, convertido en <span class="grad">una charla en vivo</span></h1>
+    <p class="bajada">Arrastrá tu <b>.pptx</b> y descargá un HTML animado que se abre con doble clic. Si querés, la sala vota y pregunta desde el celular.</p>
+  </header>
+
+  <div class="soltar" id="soltar" tabindex="0" role="button" aria-label="Elegir un archivo .pptx">
+    <strong>Arrastrá tu .pptx acá</strong>
+    <span>o hacé clic para elegirlo</span>
+    <div class="archivo" id="archivoNombre"></div>
+    <input type="file" id="archivo" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden>
+  </div>
+  <p class="privado">Tu archivo no se sube a ningún lado: se convierte acá, en tu navegador.</p>
+  <div class="error" id="error" role="alert"></div>
+
+  <div class="columnas">
+    <section class="caja" aria-labelledby="tOpciones">
+      <h2 id="tOpciones">Opciones</h2>
+
+      <div class="campo">
+        <label class="interruptor"><input type="checkbox" id="vivo"><span><b>Modo en vivo, tipo Menti</b><span>La sala vota, arma una nube de palabras y manda preguntas desde el celular.</span></span></label>
+        <div class="detalle" id="vivoDetalle">
+          <b>Cómo marcar tus diapositivas en PowerPoint</b>
+          <ul>
+            <li>Votación: titulá <code>VOTAR: ¿tu pregunta?</code> y poné cada opción como una viñeta.</li>
+            <li>Nube de palabras: titulá <code>NUBE: ¿tu pregunta?</code></li>
+            <li>Preguntas de la sala: una diapositiva titulada <code>¿Preguntas?</code></li>
+          </ul>
+          <div class="campo" style="margin-top:14px">
+            <label for="api">Dirección de tu servidor (opcional)</label>
+            <input type="url" id="api" inputmode="url" placeholder="https://mi-charla.vercel.app" autocomplete="off">
+            <small>Sin servidor, las votaciones igual funcionan: contás las manos y cargás los votos con + y −. Con servidor, la sala vota con un QR. Se puede agregar después con la tecla C. <a href="https://github.com/chimichurria/joseii#modo-en-vivo" target="_blank" rel="noopener">Cómo crear el servidor gratis</a>.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="evento">Nombre del evento (opcional)</label>
+        <input type="text" id="evento" maxlength="60" placeholder="Jornadas de Ingeniería 2026" autocomplete="off">
+        <small>Aparece arriba de cada diapositiva y en el pie.</small>
+      </div>
+
+      <div class="campo">
+        <span class="rotulo">Colores</span>
+        <div class="opciones" role="radiogroup" aria-label="Colores">
+          <label><input type="radio" name="color" value="original" checked>Naranja original</label>
+          <label><input type="radio" name="color" value="ppt">Los de mi PowerPoint</label>
+          <label><input type="radio" name="color" value="propio">Elegir</label>
+        </div>
+        <div class="colores" id="colores"><input type="color" id="color1" value="#FF3300" aria-label="Color principal"><input type="color" id="color2" value="#FF9900" aria-label="Color secundario"><span>Principal y secundario</span></div>
+      </div>
+
+      <div class="campo">
+        <label class="interruptor"><input type="checkbox" id="pasos" checked><span><b>Mostrar los puntos de a uno</b><span>Cada clic revela el punto siguiente, así la sala no lee más rápido de lo que hablás.</span></span></label>
+      </div>
+      <div class="campo">
+        <label class="interruptor"><input type="checkbox" id="notas" checked><span><b>Incluir mis notas del orador</b><span>Las ves con la tecla N. Apagalo si vas a compartir el archivo.</span></span></label>
+      </div>
+
+      <div class="campo">
+        <span class="rotulo">Logo (opcional)</span>
+        <div class="acciones" style="margin-top:0;align-items:center"><button class="boton sec" type="button" id="logoBoton" style="min-height:42px;font-size:15px">Elegir imagen</button><span id="logoNombre" style="font-size:14px;color:var(--gray)">Va en el pie de cada diapositiva.</span></div>
+        <input type="file" id="logo" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+      </div>
+    </section>
+
+    <section class="caja" aria-labelledby="tResultado">
+      <h2 id="tResultado">Tu presentación</h2>
+      <div class="marco"><div class="vacio" id="vacio">Acá vas a ver tu presentación apenas elijas el archivo.</div><iframe id="vista" title="Vista previa de la presentación" hidden></iframe></div>
+      <p class="resumen" id="resumen" aria-live="polite"></p>
+      <div class="acciones">
+        <a class="boton" id="descargar" aria-disabled="true" href="#">Descargar HTML</a>
+        <a class="boton sec" id="abrir" aria-disabled="true" href="#" target="_blank" rel="noopener">Abrir en pantalla completa</a>
+      </div>
+      <ul class="avisos" id="avisos"></ul>
+    </section>
+  </div>
+
+  <div class="pasos">
+    <div><b>01</b><h3>Presentá</h3><p>Abrí el HTML con doble clic. <code>→</code> avanza, <code>F</code> pantalla completa, <code>N</code> notas, <code>G</code> ir a una diapositiva, <code>B</code> pantalla en blanco.</p></div>
+    <div><b>02</b><h3>Sin internet también</h3><p>Es un solo archivo, con tus imágenes adentro. Llevalo en un pendrive: no necesita PowerPoint ni conexión.</p></div>
+    <div><b>03</b><h3>Guardalo como PDF</h3><p>Desde el navegador, <code>Imprimir</code> → <code>Guardar como PDF</code>: sale una diapositiva por página.</p></div>
+  </div>
+
+  <footer><span>Hecho a partir de la charla de JoSEII Rosario 2026.</span><a href="https://github.com/chimichurria/joseii" target="_blank" rel="noopener">Código y guía en GitHub</a></footer>
+</div>
+
+<script id="piezas" type="application/json">/*__PIEZAS__*/</script>
+<script>
+(function(){
+'use strict';
+/*__MODULOS__*/
+
+var PIEZAS=JSON.parse(document.getElementById('piezas').textContent);
+function $(i){return document.getElementById(i)}
+var modelo=null,nombre='',logo='',url=null,pendiente=null;
+
+function mostrarError(t){var e=$('error');e.textContent=t||'';e.classList.toggle('on',!!t)}
+function colores(){var v=document.querySelector('input[name=color]:checked').value;
+ if(v==='propio')return [$('color1').value,$('color2').value];
+ if(v==='ppt')return modelo&&modelo.colores?modelo.colores:null;
+ return null}
+function opciones(){return {evento:$('evento').value.trim(),vivo:$('vivo').checked,api:$('api').value.trim(),pasos:$('pasos').checked,notas:$('notas').checked,colores:colores(),logo:logo}}
+
+function convertir(){if(!modelo)return;var o=opciones();if(o.api&&!/^https?:\/\//i.test(o.api))o.api='https://'+o.api;
+ var r;try{r=armarHtml(modelo,o,PIEZAS)}catch(e){mostrarError('No se pudo armar la presentación: '+e.message);return}
+ mostrarError('');if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(new Blob([r.html],{type:'text/html;charset=utf-8'}));
+ var v=$('vista');v.hidden=false;v.src=url;$('vacio').hidden=true;
+ var d=$('descargar'),a=$('abrir');d.href=url;d.download=nombre.replace(/\.pptx$/i,'')+'.html';d.setAttribute('aria-disabled','false');a.href=url;a.setAttribute('aria-disabled','false');
+ var s=r.resumen,partes=[s.diapositivas+' diapositivas'];
+ if(r.config.vivo){if(s.votaciones)partes.push(s.votaciones+(s.votaciones===1?' votación':' votaciones'));if(s.nubes)partes.push(s.nubes+(s.nubes===1?' nube':' nubes'));if(s.preguntas)partes.push('preguntas de la sala')}
+ partes.push(Math.round(r.html.length/1024)+' KB');$('resumen').textContent=partes.join(' · ');
+ var avisos=r.avisos.slice();
+ if(document.querySelector('input[name=color]:checked').value==='ppt'&&!modelo.colores)avisos.push('No se encontraron colores en el tema de tu PowerPoint: se usa el naranja original.');
+ var ul=$('avisos');ul.textContent='';avisos.forEach(function(t){var li=document.createElement('li');li.textContent=t;ul.appendChild(li)});ul.classList.toggle('on',avisos.length>0)}
+function pronto(){clearTimeout(pendiente);pendiente=setTimeout(convertir,250)}
+
+function cargar(f){if(!f)return;if(!/\.pptx$/i.test(f.name)){mostrarError('Ese archivo no es .pptx. Si tenés un .ppt, Keynote o Google Slides, exportalo como PowerPoint (.pptx) y probá de nuevo.');return}
+ mostrarError('');nombre=f.name;$('archivoNombre').textContent='Leyendo '+f.name+'…';
+ f.arrayBuffer().then(function(b){return leerPptx(new Uint8Array(b),f.name)}).then(function(m){modelo=m;$('archivoNombre').textContent=f.name;convertir()})
+  .catch(function(e){modelo=null;$('archivoNombre').textContent='';mostrarError(e&&e.message?e.message:'No se pudo leer el archivo.')})}
+
+var zona=$('soltar'),entrada=$('archivo');
+zona.addEventListener('click',function(){entrada.click()});
+zona.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();entrada.click()}});
+entrada.addEventListener('change',function(){cargar(entrada.files[0]);entrada.value=''});
+['dragenter','dragover'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();zona.classList.add('sobre')})});
+['dragleave','drop'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();if(t==='drop'||e.relatedTarget===null)zona.classList.remove('sobre')})});
+document.addEventListener('drop',function(e){cargar(e.dataTransfer&&e.dataTransfer.files[0])});
+
+$('vivo').addEventListener('change',function(){$('vivoDetalle').classList.toggle('on',this.checked);convertir()});
+['pasos','notas','color1','color2'].forEach(function(i){$(i).addEventListener('change',convertir)});
+['evento','api'].forEach(function(i){$(i).addEventListener('input',pronto)});
+[].forEach.call(document.querySelectorAll('input[name=color]'),function(r){r.addEventListener('change',function(){$('colores').classList.toggle('on',r.value==='propio'&&r.checked);convertir()})});
+$('logoBoton').addEventListener('click',function(){$('logo').click()});
+$('logo').addEventListener('change',function(){var f=this.files[0];if(!f){return}if(f.size>600000){mostrarError('El logo pesa demasiado. Usá una imagen de menos de 600 KB.');return}
+ var lector=new FileReader();lector.onload=function(){logo=lector.result;$('logoNombre').textContent=f.name;convertir()};lector.readAsDataURL(f)});
+})();
+</script>
+</body>
+</html>

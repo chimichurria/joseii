@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex">
+<title>JoSEII · Taller en vivo</title>
+<style>
+:root{color-scheme:light;--red:#FF3300;--ora:#FF9900;--gray:#5f6a6e;--steel:#485458;--ink:#1B1F21;--line:#E4E7E8;--ease:cubic-bezier(.2,.75,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:#fff;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:18px 18px 20px;padding:max(18px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.marca{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);line-height:1.3}
+.marca b{color:var(--red)}
+.vivo{display:inline-flex;align-items:center;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--steel);white-space:nowrap}
+.vivo i{width:9px;height:9px;border-radius:50%;background:#2fa36b;display:block;margin-right:7px}
+.vivo.off i{background:var(--ora)}
+main{flex:1;display:flex;flex-direction:column}
+h1{font-size:27px;font-size:clamp(25px,7vw,32px);line-height:1.15;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
+.ayuda{font-size:16px;color:var(--gray);margin-bottom:20px;line-height:1.4}
+.bloque+.bloque{margin-top:30px;padding-top:26px;border-top:1px solid var(--line)}
+.ops{display:flex;flex-direction:column}
+.op+.op{margin-top:11px}
+.op{display:flex;align-items:center;width:100%;min-height:68px;padding:14px 16px;border:2px solid var(--line);border-radius:18px;background:#fff;color:var(--ink);font:inherit;font-size:19px;font-weight:700;text-align:left;cursor:pointer;transition:transform .15s var(--ease),border-color .2s,background .2s,color .2s}
+.op:active{transform:scale(.98)}
+.op .le{flex:none;margin-right:14px;width:38px;height:38px;border-radius:12px;background:#F3F4F5;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:17px}
+.op.sel{border-color:transparent;background:linear-gradient(90deg,#FF3300,#FF8A1A);color:#fff}
+.op.sel .le{background:rgba(255,255,255,.22);color:#fff}
+.op:disabled{cursor:default}
+.ok{min-height:26px;margin-top:14px;font-size:16px;font-weight:700;color:var(--steel);text-align:center}
+.espera{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 10px}
+.espera>*+*{margin-top:18px}
+.espera h1{margin-bottom:0}
+.espera p{font-size:17px;line-height:1.45;color:var(--gray);max-width:30ch}
+.pulso{width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#FF3300,#FF9900);animation:pulso 2.2s ease-in-out infinite}
+@keyframes pulso{0%,100%{transform:scale(.86);opacity:.75}50%{transform:scale(1);opacity:1}}
+.pestana{margin-top:26px}
+.boton{width:100%;min-height:56px;border-radius:16px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:17px;font-weight:700;color:var(--ink);cursor:pointer}
+.boton.pri{border:0;background:linear-gradient(90deg,#FF3300,#FF9900);color:#fff}
+.boton:disabled{opacity:.55}
+.panel{display:none;margin-top:18px}
+.panel.on{display:block}
+textarea{width:100%;min-height:104px;padding:14px;border:1.5px solid var(--line);border-radius:14px;font:inherit;font-size:17px;line-height:1.4;color:var(--ink);resize:vertical;background:#fff}
+textarea:focus-visible,.op:focus-visible,.boton:focus-visible{outline:3px solid rgba(255,51,0,.35);outline-offset:2px}
+.cont{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 12px;font-size:14px;color:var(--gray)}
+.lista{list-style:none;margin-top:18px}
+.lista li+li{margin-top:10px}
+.lista li{display:flex;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:14px;font-size:16px;line-height:1.4}
+.lista li.hecha{opacity:.55}
+.lista p{flex:1;overflow-wrap:anywhere;word-break:break-word;margin-right:12px}
+.apoyo{flex:none;min-width:58px;min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:15px;font-weight:700;color:var(--steel);cursor:pointer}
+.apoyo.si{border-color:var(--red);color:var(--red)}
+.sub{font-size:15px;font-weight:700;color:var(--steel);margin-top:22px}
+.vacio{margin-top:14px;font-size:15px;color:var(--gray)}
+.aviso{margin-top:10px;font-size:15px;color:#B42318;min-height:20px;text-align:center}
+.caja{width:100%;min-height:62px;padding:14px 16px;border:2px solid var(--line);border-radius:16px;font:inherit;font-size:19px;color:var(--ink);background:#fff;margin-bottom:12px}
+.caja:focus-visible{outline:3px solid rgba(255,51,0,.35);outline-offset:2px}
+.momento{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 8px}
+.momento>*+*{margin-top:16px}
+.momento p{font-size:17px;line-height:1.45;color:var(--gray);max-width:32ch}
+.enlace{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;border-radius:18px;background:linear-gradient(90deg,#FF3300,#FF9900);color:#fff;font-size:19px;font-weight:700;text-decoration:none}
+.avance{display:none;margin-bottom:18px}
+.avance.on{display:block}
+.avance p{font-size:13px;font-weight:700;color:var(--steel);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.avance div{height:5px;border-radius:3px;background:#EEF0F1;overflow:hidden}
+.avance i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FF3300,#FF9900);transition:width .5s var(--ease)}
+.pasito{font-size:15px;font-weight:700;color:var(--red);letter-spacing:.04em}
+@media (prefers-reduced-motion:reduce){.pulso{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">JoSEII <b>Rosario 2026</b><br>Taller en vivo</div>
+  <div class="vivo" id="vivo"><i></i><span id="vivoTx">EN VIVO</span></div>
+</header>
+<div class="avance" id="avance" aria-hidden="true"><p id="avTx"></p><div><i id="avBar"></i></div></div>
+<main>
+  <section id="zona" aria-live="polite" style="flex:1;display:flex;flex-direction:column"></section>
+  <div class="pestana">
+    <button class="boton" id="abrirP" aria-expanded="false">Hacer una pregunta</button>
+    <div class="panel" id="panelP">
+      <form id="formP">
+        <label class="sub" for="textoP" style="display:block;margin:0 0 8px">Tu pregunta es anónima</label>
+        <textarea id="textoP" maxlength="200" placeholder="Escribí tu pregunta acá"></textarea>
+        <div class="cont"><span id="estadoP"></span><span id="largoP">0 / 200</span></div>
+        <button class="boton pri" id="enviarP" type="submit">Enviar pregunta</button>
+      </form>
+      <div class="aviso" id="avisoP"></div>
+      <h2 class="sub">Preguntas de la sala</h2>
+      <ul class="lista" id="listaP"></ul>
+      <p class="vacio" id="vacioP">Todavía no hay preguntas en pantalla.</p>
+    </div>
+  </div>
+</main>
+<script>
+(function(){
+var LS={get:function(k){try{return localStorage.getItem('joseii_'+k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem('joseii_'+k,v)}catch(e){}}};
+function nuevoId(){var r=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36)+Math.random().toString(36).slice(2);return r}
+var disp=LS.get('disp');if(!disp){disp=nuevoId();LS.set('disp',disp)}
+var votos={};try{votos=JSON.parse(LS.get('votos')||'{}')}catch(e){}
+var apoyadas={};try{apoyadas=JSON.parse(LS.get('apoyos')||'{}')}catch(e){}
+var zona=document.getElementById('zona'),firma='',fallos=0,temporizador=null,pregAbierta=false;
+var FEEDBACK='https://es.surveymonkey.com/r/Feedback-Charla-Ternium';
+var MOMENTOS={7:1,24:1,25:1,26:1},PASOS_DEMO=['Preguntar','Principios','Especificar','Aclarar'],rondaVista=LS.get('ronda');
+
+function api(ruta,datos){var op=datos?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)}:{};
+ return fetch('/api/'+ruta,op).then(function(r){return r.json().then(function(j){if(!r.ok){var e=new Error(j.error||'Error');e.estado=r.status;throw e}return j})})}
+
+function el(tag,cl,tx){var n=document.createElement(tag);if(cl)n.className=cl;if(tx!=null)n.textContent=tx;return n}
+
+function revisarRonda(st){var r=String(st.ronda||0);if(rondaVista===r)return;var nueva=rondaVista===null;rondaVista=r;LS.set('ronda',r);if(nueva)return;
+ votos={};apoyadas={};LS.set('votos','{}');LS.set('apoyos','{}');LS.set('carrera','');LS.set('appVista','0');firma=''}
+function avance(st){var a=document.getElementById('avance');if(!st.enVivo||!st.total){a.className='avance';return}a.className='avance on';
+ document.getElementById('avTx').textContent=st.titulo==='Antesala'?'La charla está por empezar':'Vamos por la '+st.diapositiva+' de '+st.total+(st.titulo?' · '+st.titulo:'');
+ document.getElementById('avBar').style.width=(st.titulo==='Antesala'?0:st.diapositiva/st.total*100)+'%'}
+function pintar(st){
+ revisarRonda(st);avance(st);
+ var appVista=+(LS.get('appVista')||0);
+ if(st.app&&st.app>appVista&&!st.encuestas.length){LS.set('appVista',st.app);location.href='/app';return}
+ var d=st.encuestas.length?0:st.diapositiva,sig=JSON.stringify([st.encuestas.map(function(e){return e.id}),st.abierta,MOMENTOS[d]?d:0,d===4?st.paso:-1]);
+ if(d===25&&!pregAbierta){pregAbierta=true;if(!panel.classList.contains('on'))abrirP.click()}
+ if(sig===firma)return;firma=sig;zona.innerHTML='';
+ if(MOMENTOS[d]){
+  var m=el('div','momento');
+  if(d===24){m.appendChild(el('h1',null,'Ahora te toca a vos'));m.appendChild(el('p',null,'Escribí tu problema en cuatro pasos y llevate un prompt para tu IA.'));var pr=el('a','enlace','Empezar');pr.href='/practica';m.appendChild(pr)}
+  if(d===7){m.appendChild(el('h1',null,'Ahora probalo vos'));m.appendChild(el('p',null,'Cambiá los supuestos y mirá cómo cambia el número.'));var a=el('a','enlace','Abrir la calculadora');a.href='/app';m.appendChild(a)}
+  if(d===25){m.appendChild(el('h1',null,'Te toca preguntar'));m.appendChild(el('p',null,'Escribí tu pregunta abajo. Es anónima.'))}
+  if(d===26){m.appendChild(el('h1',null,'¡Gracias por venir!'));m.appendChild(el('p',null,'Contanos qué te pareció: nos ayuda muchísimo.'));var b=el('a','enlace','Dejar mi opinión');b.href=FEEDBACK;b.target='_blank';b.rel='noopener';m.appendChild(b)}
+  zona.appendChild(m);return}
+ if(d===4){var dm=el('div','momento'),px=st.paso||0;dm.appendChild(el('div','pulso'));dm.appendChild(el('h1',null,'La armamos entre todos'));
+  dm.appendChild(el('p','pasito',px?'Paso '+px+' de 8 · '+(PASOS_DEMO[px-1]||''):'Mirá la pantalla'));dm.appendChild(el('p',null,'Dejá esta página abierta: cuando la IA necesite una decisión, votás acá.'));zona.appendChild(dm);return}
+ if(!st.encuestas.length){
+  var e=el('div','espera');e.appendChild(el('div','pulso'));e.appendChild(el('h1',null,'Esperando la próxima pregunta'));
+  e.appendChild(el('p',null,'Dejá esta página abierta: la pregunta aparece sola cuando llegue el momento.'));zona.appendChild(e);return}
+ st.encuestas.forEach(function(enc){
+  var b=el('div','bloque');b.appendChild(el('h1',null,enc.pregunta));b.appendChild(el('p','ayuda',enc.ayuda||''));
+  if(enc.tipo==='texto'){cajaTexto(b,st.abierta);zona.appendChild(b);return}
+  var ops=el('div','ops'),ok=el('p','ok',votos[enc.id]?(st.abierta?'Voto registrado. Podés cambiarlo.':'Votación cerrada. Mirá la pantalla.'):(st.abierta?'':'Votación cerrada. Mirá la pantalla.'));
+  ok.setAttribute('role','status');
+  enc.opciones.forEach(function(o,i){var bt=el('button','op');bt.type='button';bt.disabled=!st.abierta;
+   var le=el('span','le',o.id.length===1?o.id:String.fromCharCode(65+i));bt.appendChild(le);bt.appendChild(el('span',null,o.texto));
+   if(votos[enc.id]===o.id)bt.classList.add('sel');
+   bt.addEventListener('click',function(){votar(enc.id,o.id,ops,bt,ok)});ops.appendChild(bt)});
+  b.appendChild(ops);b.appendChild(ok);zona.appendChild(b)})}
+
+function cajaTexto(b,abierta){var f=el('form'),i=el('input','caja'),bt=el('button','boton pri','Enviar'),ok=el('p','ok',LS.get('carrera')?'Enviaste: '+LS.get('carrera')+'. Podés cambiarla.':'');
+ i.type='text';i.maxLength=32;i.placeholder='Ej.: Ingeniería Industrial';i.autocomplete='off';i.setAttribute('aria-label','Tu carrera');i.disabled=!abierta;bt.type='submit';bt.disabled=!abierta;ok.setAttribute('role','status');
+ f.appendChild(i);f.appendChild(bt);b.appendChild(f);b.appendChild(ok);
+ f.addEventListener('submit',function(ev){ev.preventDefault();var t=i.value.trim();if(t.length<2){ok.textContent='Escribí tu carrera.';return}bt.disabled=true;ok.textContent='Enviando…';
+  api('palabra',{texto:t,dispositivo:disp}).then(function(r){LS.set('carrera',r.texto);i.value='';i.blur();ok.textContent='¡Listo! Mirá la pantalla: '+r.texto}).catch(function(e){ok.textContent=e.message||'No se pudo enviar. Probá de nuevo.'}).then(function(){bt.disabled=false})})}
+
+function votar(enc,op,ops,bt,ok){
+ var previa=votos[enc];
+ [].forEach.call(ops.children,function(x){x.classList.remove('sel')});bt.classList.add('sel');ok.textContent='Enviando…';
+ api('votar',{encuesta:enc,opcion:op,dispositivo:disp}).then(function(){votos[enc]=op;LS.set('votos',JSON.stringify(votos));ok.textContent='Voto registrado. Podés cambiarlo.'}).catch(function(e){
+  bt.classList.remove('sel');if(previa)[].forEach.call(ops.children,function(x,i){x.classList.toggle('sel',false)});ok.textContent=e.estado===409?'La votación está cerrada.':'No se pudo enviar. Probá de nuevo.'})}
+
+function estadoRed(on){var v=document.getElementById('vivo');v.classList.toggle('off',!on);document.getElementById('vivoTx').textContent=on?'EN VIVO':'RECONECTANDO'}
+
+function ciclo(){clearTimeout(temporizador);
+ if(document.hidden)return;
+ api('estado').then(function(st){fallos=0;estadoRed(true);pintar(st);botonP(st.recibePreguntas)}).catch(function(){fallos++;estadoRed(false)}).then(function(){
+  if(panel.classList.contains('on'))return cargarP()}).then(function(){temporizador=setTimeout(ciclo,Math.min(1000+fallos*900,9000)+Math.random()*300)})}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)ciclo()});
+window.addEventListener('pageshow',ciclo);window.addEventListener('online',ciclo);
+
+var abrirP=document.getElementById('abrirP'),panel=document.getElementById('panelP'),form=document.getElementById('formP'),texto=document.getElementById('textoP'),largo=document.getElementById('largoP'),aviso=document.getElementById('avisoP'),enviar=document.getElementById('enviarP');
+abrirP.addEventListener('click',function(){var on=panel.classList.toggle('on');abrirP.setAttribute('aria-expanded',on);abrirP.textContent=on?'Cerrar preguntas':'Hacer una pregunta';if(on){cargarP();texto.focus()}});
+texto.addEventListener('input',function(){largo.textContent=texto.value.length+' / 200'});
+function botonP(rec){enviar.disabled=!rec;document.getElementById('estadoP').textContent=rec?'':'Preguntas cerradas'}
+form.addEventListener('submit',function(ev){ev.preventDefault();var t=texto.value.trim();if(t.length<3){aviso.textContent='Escribí tu pregunta.';return}
+ enviar.disabled=true;aviso.textContent='';api('preguntar',{texto:t,dispositivo:disp}).then(function(){texto.value='';largo.textContent='0 / 200';aviso.style.color='#2a7d55';aviso.textContent='Recibida. Si se aprueba, aparece en pantalla.'}).catch(function(e){aviso.style.color='#B42318';aviso.textContent=e.message||'No se pudo enviar.'}).then(function(){enviar.disabled=false})});
+function cargarP(){return api('preguntas').then(function(r){var ul=document.getElementById('listaP');ul.innerHTML='';document.getElementById('vacioP').style.display=r.preguntas.length?'none':'block';
+ r.preguntas.forEach(function(p){var li=el('li',p.estado==='respondida'?'hecha':'');li.appendChild(el('p',null,p.texto));
+  var b=el('button','apoyo'+(apoyadas[p.id]?' si':''),'▲ '+p.apoyos);b.type='button';b.setAttribute('aria-label','Apoyar esta pregunta, '+p.apoyos+' apoyos');b.disabled=!!apoyadas[p.id]||p.estado==='respondida';
+  b.addEventListener('click',function(){b.disabled=true;api('apoyar',{pregunta:p.id,dispositivo:disp}).then(function(){apoyadas[p.id]=1;LS.set('apoyos',JSON.stringify(apoyadas));b.classList.add('si');b.textContent='▲ '+(p.apoyos+1)}).catch(function(){b.disabled=false})});
+  li.appendChild(b);ul.appendChild(li)})}).catch(function(){})}
+ciclo();
+})();
+</script>
+</body>
+</html>

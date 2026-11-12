@@ -1,0 +1,19 @@
+{
+  "name": "joseii",
+  "version": "1.0.0",
+  "description": "Convierte un PowerPoint en una presentación HTML con votaciones en vivo.",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20.12" },
+  "scripts": {
+    "construir": "node construir.mjs",
+    "convertir": "node convertir.mjs",
+    "test": "node pruebas/probar.mjs",
+    "probar": "node pruebas/probar.mjs",
+    "probar:vivo": "node pruebas/vivo.mjs",
+    "vivo:local": "node pruebas/servidor-local.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.0"
+  }
+}

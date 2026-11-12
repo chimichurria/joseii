@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex">
+<title>Hecha en vivo · JoSEII</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#1B1F21}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid #E4E7E8;flex:none}
+header b{font-size:14px;color:#FF3300;letter-spacing:.02em}
+header a{display:inline-flex;align-items:center;min-height:40px;font-size:15px;font-weight:700;color:#485458;text-decoration:none}
+iframe{flex:1;width:100%;border:0;background:#fff}
+</style>
+</head>
+<body>
+<header><b>Hecha en vivo, recién</b><a href="/">Volver a la charla</a></header>
+<iframe id="app" title="Aplicación creada en la charla" sandbox="allow-scripts allow-forms"></iframe>
+<script>
+fetch('/api/estado').then(function(r){return r.json()}).then(function(e){
+ if(e.app)document.getElementById('app').src='/api/app?v='+e.app;else location.replace('/calculadora');
+}).catch(function(){location.replace('/calculadora')});
+</script>
+<script>
+/* Vuelve a la charla cuando se abre una votacion o llega el cierre. */
+(function(){var d0;setInterval(function(){fetch('/api/estado').then(function(r){return r.json()}).then(function(e){if(d0===undefined)d0=e.diapositiva;var abiertas=(e.encuestas||[]).filter(function(x){return x.id!=='carrera'}).length;if(abiertas||(d0<24&&e.diapositiva>=24))location.href='/'}).catch(function(){})},4000)})();
+</script>
+</body>
+</html>

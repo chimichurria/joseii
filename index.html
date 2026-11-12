@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convertí tu PowerPoint en una charla en vivo</title>
+<meta name="description" content="Arrastrá tu .pptx y descargá una presentación HTML animada, con votaciones en vivo opcionales. Todo pasa en tu navegador.">
+<style>
+:root{color-scheme:light;--c1:#FF3300;--c2:#FF9900;--gray:#5f6a6e;--steel:#485458;--ink:#1B1F21;--line:#E2E6E8;--suave:#F6F7F8;--ease:cubic-bezier(.2,.75,.2,1);--mono:Consolas,"SF Mono",Menlo,"Courier New",monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#fff}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--ink);line-height:1.5;min-height:100vh;background:
+  radial-gradient(620px 420px at -6% -8%,rgba(255,51,0,.13),transparent 70%),
+  radial-gradient(560px 420px at 106% 4%,rgba(255,153,0,.14),transparent 70%),#fff;background-repeat:no-repeat}
+.pagina{max-width:1080px;margin:0 auto;padding:48px 24px 64px}
+.kicker{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--c1);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.kicker::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--c1);box-shadow:0 0 10px var(--c1)}
+h1{font-size:clamp(34px,5.4vw,58px);line-height:1.06;letter-spacing:-.02em;max-width:17ch;text-wrap:balance}
+.grad{background:linear-gradient(90deg,var(--c1),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.bajada{font-size:clamp(17px,2vw,20px);color:var(--gray);max-width:60ch;margin-top:16px}
+h2{font-size:22px;letter-spacing:-.01em;margin-bottom:6px}
+.soltar{margin-top:34px;border:2px dashed rgba(72,84,88,.35);border-radius:24px;background:rgba(255,255,255,.75);padding:44px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .2s var(--ease)}
+.soltar:hover,.soltar:focus-visible,.soltar.sobre{border-color:var(--c1);background:rgba(255,51,0,.04);outline:none}
+.soltar.sobre{transform:scale(1.01)}
+.soltar strong{display:block;font-size:22px}
+.soltar span{display:block;color:var(--gray);margin-top:6px;font-size:16px}
+.soltar .archivo{margin-top:14px;font-family:var(--mono);font-size:14px;color:var(--steel);font-weight:700}
+.privado{margin-top:12px;font-size:14px;color:var(--gray);text-align:center}
+.columnas{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:28px;margin-top:34px;align-items:start}
+.caja{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 12px 36px rgba(72,84,88,.08)}
+.campo{margin-top:20px}
+.campo>label,.campo>.rotulo{display:block;font-size:14px;font-weight:700;margin-bottom:7px}
+.campo small{display:block;color:var(--gray);font-size:13.5px;margin-top:6px;line-height:1.45}
+input[type=text],input[type=url]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #C9D0D3;font:inherit;font-size:16px;color:var(--ink);background:#fff}
+input:focus-visible,button:focus-visible,.interruptor:focus-within{outline:3px solid rgba(255,51,0,.35);outline-offset:2px}
+.interruptor{display:flex;gap:14px;align-items:flex-start;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--suave);cursor:pointer}
+.interruptor input{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:14px;background:#C9D0D3;position:relative;cursor:pointer;transition:background .2s;margin-top:2px}
+.interruptor input::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s var(--ease);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.interruptor input:checked{background:linear-gradient(90deg,var(--c1),var(--c2))}
+.interruptor input:checked::after{transform:translateX(18px)}
+.interruptor b{display:block;font-size:16px}
+.interruptor span{display:block;font-size:14px;color:var(--gray);line-height:1.45;margin-top:2px}
+.detalle{display:none;margin-top:12px;padding:16px;border-radius:16px;border:1px solid rgba(255,51,0,.25);background:rgba(255,51,0,.035);font-size:14.5px;line-height:1.5}
+.detalle.on{display:block}
+.detalle ul{margin:8px 0 4px 18px}
+.detalle li{margin:4px 0}
+.detalle code,.pasos code{font-family:var(--mono);font-size:.94em;background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.opciones{display:flex;flex-wrap:wrap;gap:8px}
+.opciones label{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;border:1px solid #C9D0D3;font-size:14.5px;cursor:pointer;background:#fff}
+.opciones input{accent-color:var(--c1)}
+.opciones label:has(input:checked){border-color:var(--c1);box-shadow:0 0 0 3px rgba(255,51,0,.12)}
+.colores{display:none;gap:12px;margin-top:10px;align-items:center;font-size:14px}
+.colores.on{display:flex}
+.colores input{width:44px;height:36px;border:1px solid #C9D0D3;border-radius:10px;padding:2px;background:#fff;cursor:pointer}
+.boton{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 24px;border-radius:999px;border:0;background:linear-gradient(90deg,var(--c1),var(--c2));color:#fff;font:inherit;font-size:16.5px;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 10px 26px rgba(255,51,0,.26)}
+.boton.sec{background:#fff;color:var(--ink);border:1px solid #C9D0D3;box-shadow:none}
+.boton[aria-disabled=true]{opacity:.45;pointer-events:none;box-shadow:none}
+.acciones{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.marco{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--suave)}
+.marco iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.marco .vacio{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--gray);padding:24px;font-size:15.5px}
+.resumen{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--steel);margin-top:14px;min-height:21px}
+.avisos{list-style:none;margin-top:12px;display:none;flex-direction:column;gap:8px}
+.avisos.on{display:flex}
+.avisos li{font-size:14px;line-height:1.45;padding:10px 12px;border-radius:12px;background:#FFF6E5;border:1px solid #F4D9A6;color:#6B4A00}
+.error{display:none;margin-top:16px;padding:14px 16px;border-radius:14px;background:#FDECEA;border:1px solid #F3B8B1;color:#8A1C12;font-size:15px}
+.error.on{display:block}
+.pasos{margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.pasos div{padding:22px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.8)}
+.pasos b{display:block;font-family:var(--mono);color:var(--c1);font-size:14px;letter-spacing:.1em;margin-bottom:8px}
+.pasos h3{font-size:18px;margin-bottom:6px}
+.pasos p{font-size:14.5px;color:var(--gray);line-height:1.5}
+footer{margin-top:44px;font-size:14px;color:var(--gray);display:flex;gap:8px 20px;flex-wrap:wrap;justify-content:space-between}
+footer a{color:var(--steel);font-weight:700}
+@media (max-width:860px){.columnas{grid-template-columns:1fr}.pasos{grid-template-columns:1fr}.pagina{padding-top:32px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header>
+    <div class="kicker">Conversor · un solo archivo, sin instalar nada</div>
+    <h1>Tu PowerPoint, convertido en <span class="grad">una charla en vivo</span></h1>
+    <p class="bajada">Arrastrá tu <b>.pptx</b> y descargá un HTML animado que se abre con doble clic. Si querés, la sala vota y pregunta desde el celular.</p>
+  </header>
+
+  <div class="soltar" id="soltar" tabindex="0" role="button" aria-label="Elegir un archivo .pptx">
+    <strong>Arrastrá tu .pptx acá</strong>
+    <span>o hacé clic para elegirlo</span>
+    <div class="archivo" id="archivoNombre"></div>
+    <input type="file" id="archivo" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden>
+  </div>
+  <p class="privado">Tu archivo no se sube a ningún lado: se convierte acá, en tu navegador.</p>
+  <div class="error" id="error" role="alert"></div>
+
+  <div class="columnas">
+    <section class="caja" aria-labelledby="tOpciones">
+      <h2 id="tOpciones">Opciones</h2>
+
+      <div class="campo">
+        <label class="interruptor"><input type="checkbox" id="vivo"><span><b>Modo en vivo, tipo Menti</b><span>La sala vota, arma una nube de palabras y manda preguntas desde el celular.</span></span></label>
+        <div class="detalle" id="vivoDetalle">
+          <b>Cómo marcar tus diapositivas en PowerPoint</b>
+          <ul>
+            <li>Votación: titulá <code>VOTAR: ¿tu pregunta?</code> y poné cada opción como una viñeta.</li>
+            <li>Nube de palabras: titulá <code>NUBE: ¿tu pregunta?</code></li>
+            <li>Preguntas de la sala: una diapositiva titulada <code>¿Preguntas?</code></li>
+          </ul>
+          <div class="campo" style="margin-top:14px">
+            <label for="api">Dirección de tu servidor (opcional)</label>
+            <input type="url" id="api" inputmode="url" placeholder="https://mi-charla.vercel.app" autocomplete="off">
+            <small>Sin servidor, las votaciones igual funcionan: contás las manos y cargás los votos con + y −. Con servidor, la sala vota con un QR. Se puede agregar después con la tecla C. <a href="https://github.com/chimichurria/joseii#modo-en-vivo" target="_blank" rel="noopener">Cómo crear el servidor gratis</a>.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="evento">Nombre del evento (opcional)</label>
+        <input type="text" id="evento" maxlength="60" placeholder="Jornadas de Ingeniería 2026" autocomplete="off">
+        <small>Aparece arriba de cada diapositiva y en el pie.</small>
+      </div>
+
+      <div class="campo">
+        <span class="rotulo">Colores</span>
+        <div class="opciones" role="radiogroup" aria-label="Colores">
+          <label><input type="radio" name="color" value="original" checked>Naranja original</label>
+          <label><input type="radio" name="color" value="ppt">Los de mi PowerPoint</label>
+          <label><input type="radio" name="color" value="propio">Elegir</label>
+        </div>
+        <div class="colores" id="colores"><input type="color" id="color1" value="#FF3300" aria-label="Color principal"><input type="color" id="color2" value="#FF9900" aria-label="Color secundario"><span>Principal y secundario</span></div>
+      </div>
+
+      <div class="campo">
+        <label class="interruptor"><input type="checkbox" id="pasos" checked><span><b>Mostrar los puntos de a uno</b><span>Cada clic revela el punto siguiente, así la sala no lee más rápido de lo que hablás.</span></span></label>
+      </div>
+      <div class="campo">
+        <label class="interruptor"><input type="checkbox" id="notas" checked><span><b>Incluir mis notas del orador</b><span>Las ves con la tecla N. Apagalo si vas a compartir el archivo.</span></span></label>
+      </div>
+
+      <div class="campo">
+        <span class="rotulo">Logo (opcional)</span>
+        <div class="acciones" style="margin-top:0;align-items:center"><button class="boton sec" type="button" id="logoBoton" style="min-height:42px;font-size:15px">Elegir imagen</button><span id="logoNombre" style="font-size:14px;color:var(--gray)">Va en el pie de cada diapositiva.</span></div>
+        <input type="file" id="logo" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+      </div>
+    </section>
+
+    <section class="caja" aria-labelledby="tResultado">
+      <h2 id="tResultado">Tu presentación</h2>
+      <div class="marco"><div class="vacio" id="vacio">Acá vas a ver tu presentación apenas elijas el archivo.</div><iframe id="vista" title="Vista previa de la presentación" hidden></iframe></div>
+      <p class="resumen" id="resumen" aria-live="polite"></p>
+      <div class="acciones">
+        <a class="boton" id="descargar" aria-disabled="true" href="#">Descargar HTML</a>
+        <a class="boton sec" id="abrir" aria-disabled="true" href="#" target="_blank" rel="noopener">Abrir en pantalla completa</a>
+      </div>
+      <ul class="avisos" id="avisos"></ul>
+    </section>
+  </div>
+
+  <div class="pasos">
+    <div><b>01</b><h3>Presentá</h3><p>Abrí el HTML con doble clic. <code>→</code> avanza, <code>F</code> pantalla completa, <code>N</code> notas, <code>G</code> ir a una diapositiva, <code>B</code> pantalla en blanco.</p></div>
+    <div><b>02</b><h3>Sin internet también</h3><p>Es un solo archivo, con tus imágenes adentro. Llevalo en un pendrive: no necesita PowerPoint ni conexión.</p></div>
+    <div><b>03</b><h3>Guardalo como PDF</h3><p>Desde el navegador, <code>Imprimir</code> → <code>Guardar como PDF</code>: sale una diapositiva por página.</p></div>
+  </div>
+
+  <footer><span>Hecho a partir de la charla de JoSEII Rosario 2026.</span><a href="https://github.com/chimichurria/joseii" target="_blank" rel="noopener">Código y guía en GitHub</a></footer>
+</div>
+
+<script id="piezas" type="application/json">{"css":"/* Estilo de la presentación. Los colores --c1 y --c2 los define el conversor. */\n:root{color-scheme:light;--c1:#FF3300;--c2:#FF9900;--c1-rgb:255,51,0;--c2-rgb:255,153,0;--gray:#666;--steel:#485458;--ink:#1B1F21;--ease:cubic-bezier(.2,.75,.2,1);--mono:Consolas,\"SF Mono\",Menlo,\"Courier New\",monospace}\n*{box-sizing:border-box;margin:0;padding:0}\nhtml,body{height:100%;background:#fff;font-family:Arial,Helvetica,sans-serif;color:var(--ink);overflow:hidden}\n#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1}\n#stage{width:1600px;height:900px;position:relative;transform-origin:center;flex:none}\n#bg{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none}\n.gridbg{position:absolute;inset:-40px;background-image:linear-gradient(rgba(72,84,88,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(72,84,88,.07) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse 70% 65% at 50% 45%,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse 70% 65% at 50% 45%,#000 30%,transparent 80%);animation:gridmove 30s linear infinite}\n@keyframes gridmove{to{background-position:44px 44px}}\n.glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.2;animation:drift 18s ease-in-out infinite;pointer-events:none}\n.glow.g1{width:620px;height:620px;left:-180px;top:-200px;background:var(--c1)}\n.glow.g2{width:560px;height:560px;right:-160px;bottom:-220px;background:var(--c2);animation-delay:-9s}\n@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,-40px)}}\n\n/* Diapositivas */\n.slide{position:absolute;inset:0;padding:60px 80px 96px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:scale(1.02);filter:blur(10px);transition:opacity .7s var(--ease),transform .9s var(--ease),filter .7s var(--ease),visibility .7s}\n.slide.active{opacity:1;visibility:visible;transform:none;filter:none}\n.slide.sale>*{opacity:0!important;transform:translateY(-16px)!important;transition:opacity .26s ease-in,transform .26s ease-in!important}\n.puntitos{position:absolute;inset:0;width:1600px;height:900px;opacity:.3;pointer-events:none}\n.kicker{font-family:var(--mono);font-size:19px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--c1);margin-bottom:16px;min-height:24px;display:flex;align-items:center;gap:12px;position:relative;flex:none}\n.kicker::before{content:\"\";width:10px;height:10px;border-radius:2px;background:var(--c1);box-shadow:0 0 12px var(--c1);animation:blink 1.6s steps(2) infinite;flex:none}\n@keyframes blink{50%{opacity:.25}}\n.cur{display:inline-block;width:10px;height:20px;background:var(--c2);margin-left:4px;animation:blink 1s steps(2) infinite}\n.t{font-size:52px;line-height:1.14;font-weight:700;max-width:1400px;letter-spacing:-.01em;position:relative;flex:none}\n.t.xl{font-size:64px;line-height:1.1}.t.s{font-size:42px}.t.xs{font-size:34px}\n.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em}\n.w>span{display:inline-block;transform:translateY(110%);transition:transform .8s var(--ease)}\n.active .w>span{transform:none}\n.grad{background:linear-gradient(90deg,var(--c1),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}\n.sub{font-size:27px;color:var(--gray);margin-top:14px;line-height:1.4;max-width:1250px;position:relative;flex:none}\n.muted{color:var(--gray)}\n.a{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}\n.active .a{opacity:1;transform:none}\n.active .d1{transition-delay:.15s}.active .d2{transition-delay:.3s}.active .d3{transition-delay:.45s}.active .d4{transition-delay:.6s}.active .d5{transition-delay:.75s}.active .d6{transition-delay:.9s}\n.f{opacity:0;transform:translateY(20px) scale(.97);filter:blur(6px);transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease)}\n.f.on{opacity:1;transform:none;filter:none}\n\n/* Cuerpo: todo se mide en em para poder achicarlo si no entra (--k lo calcula el motor). */\n.cuerpo{flex:1;min-height:0;display:flex;align-items:center;margin-top:26px;position:relative}\n.in{width:100%;font-size:calc(32px*var(--k,1))}\n.cuerpo.desborda{align-items:flex-start;overflow-y:auto;overscroll-behavior:contain}\n.portada .puntitos{opacity:.2}\n.parrafo{font-size:1.3em;line-height:1.42;max-width:1300px}\n.parrafo+.parrafo{margin-top:.7em;color:var(--gray);font-size:1em}\n.lista{list-style:none}\n.lista>li{position:relative;padding-left:1.25em;margin:.5em 0;line-height:1.36}\n.lista>li::before{content:\"\";position:absolute;left:0;top:.42em;width:.48em;height:.48em;border-radius:.1em;background:linear-gradient(135deg,var(--c1),var(--c2))}\n.lista.dos-col{columns:2;column-gap:2em}\n.lista.dos-col>li{break-inside:avoid;margin:0 0 .5em}\n.lista ul{list-style:none;margin-top:.25em}\n.lista ul li{font-size:.8em;color:var(--gray);line-height:1.4;padding-left:1em;position:relative}\n.lista ul li::before{content:\"·\";position:absolute;left:.2em;font-weight:700}\n.filas{display:flex;flex-direction:column;gap:.75em}\n.fila{display:flex;align-items:center;gap:.85em}\n.fila .ft{font-size:1.08em;font-weight:700;line-height:1.26}\n.fila .fs{font-size:.8em;color:var(--gray);line-height:1.4;margin-top:.2em}\n.grilla{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:1em;align-items:stretch}\n.card{position:relative;background:rgba(255,255,255,.74);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(72,84,88,.12);border-radius:22px;padding:1.05em 1.15em;box-shadow:0 14px 44px rgba(72,84,88,.10)}\n.card::before,.card::after{content:\"\";position:absolute;width:26px;height:26px;pointer-events:none}\n.card::before{left:-1px;top:-1px;border-left:3px solid var(--c1);border-top:3px solid var(--c1);border-top-left-radius:22px}\n.card::after{right:-1px;bottom:-1px;border-right:3px solid var(--c2);border-bottom:3px solid var(--c2);border-bottom-right-radius:22px}\n.card.dark{background:linear-gradient(135deg,#2f393c,#485458 55%,#5b6a6f);color:#fff;border-color:transparent;box-shadow:0 16px 50px rgba(var(--c1-rgb),.18)}\n.card h3{font-size:1.08em;line-height:1.22;margin:.55em 0 .4em}\n.card p,.card li{font-size:.8em;line-height:1.45;color:var(--gray)}\n.card p.grande{font-size:.98em;color:var(--ink);font-weight:700;line-height:1.3;margin-top:.6em}\n.card ul{list-style:none}.card li+li{margin-top:.3em}\n.card.dark p,.card.dark li,.card.dark p.grande{color:#E7ECEE}\n.dot{width:2.1em;height:2.1em;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.92em;flex:none;box-shadow:0 0 0 .25em rgba(var(--c1-rgb),.10),0 .35em .9em rgba(var(--c1-rgb),.3)}\n.dot.s{background:linear-gradient(135deg,#2f393c,#5b6a6f);box-shadow:0 0 0 .25em rgba(72,84,88,.10),0 .35em .9em rgba(72,84,88,.3)}\n.dos{display:flex;gap:1.7em;align-items:center}\n.dos .col{flex:1.15;min-width:0}.dos .fotos{flex:1;min-width:0}\n.fotos{display:grid;gap:.6em;grid-template-columns:repeat(var(--cols,1),1fr);align-items:center}\n.fotos img{display:block;width:100%;max-height:calc(590px*var(--k,1));object-fit:contain;border-radius:18px}\n.fotos.marco img{box-shadow:0 14px 44px rgba(72,84,88,.16)}\n.tabla{width:100%;border-collapse:separate;border-spacing:0;font-size:.8em;background:rgba(255,255,255,.8);border-radius:16px}\n.tabla th{text-align:left;font-family:var(--mono);font-size:.78em;letter-spacing:.08em;text-transform:uppercase;color:var(--c1);padding:.7em .9em;border-bottom:2px solid var(--c1)}\n.tabla td{padding:.62em .9em;border-bottom:1px solid rgba(72,84,88,.14);line-height:1.35}\n.tabla tr:last-child td{border-bottom:0}\n.quote{font-size:2.5em;font-weight:700;line-height:1.12;letter-spacing:-.015em;max-width:1350px}\n.autor{margin-top:1.3em;font-size:.86em;color:var(--gray);font-family:var(--mono)}\n.big{font-size:6.6em;font-weight:700;line-height:1;letter-spacing:-.02em}\n.big+.parrafo{margin-top:.5em}\n\n/* Portada y separadores */\n.portada{justify-content:center}\n.portada .t{font-size:72px;line-height:1.06;max-width:980px}\n.portada .t.s{font-size:58px}.portada .t.xs{font-size:46px}\n.portada .sub{font-size:30px;max-width:900px}\n.portada .foto-portada{position:absolute;right:70px;top:50%;transform:translateY(-50%);width:520px;max-height:620px;object-fit:contain;border-radius:22px}\n.adorno{position:absolute;right:-60px;top:50%;width:640px;height:640px;margin-top:-320px;pointer-events:none}\n.adorno i{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(72,84,88,.28);animation:spin 46s linear infinite}\n.adorno i:nth-child(2){inset:90px;border:2px solid rgba(var(--c1-rgb),.22);border-left-color:var(--c1);animation-duration:22s;animation-direction:reverse}\n.adorno i:nth-child(3){inset:180px;border:2px solid rgba(var(--c2-rgb),.25);border-top-color:var(--c2);animation-duration:14s}\n.adorno b{position:absolute;inset:262px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--c2),var(--c1) 70%);animation:ring 2.4s ease-out infinite}\n@keyframes spin{to{transform:rotate(360deg)}}\n@keyframes ring{0%{box-shadow:0 0 0 0 rgba(var(--c1-rgb),.4)}100%{box-shadow:0 0 0 54px rgba(var(--c1-rgb),0)}}\n.seccion{justify-content:center}\n.seccion .nro{font-family:var(--mono);font-size:120px;font-weight:700;line-height:1;margin-bottom:18px;position:relative}\n.seccion .t{font-size:84px;line-height:1.05}\n.seccion .t.s{font-size:64px}.seccion .t.xs{font-size:50px}\n\n/* Pie */\n.foot{position:absolute;left:80px;right:80px;bottom:28px;display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:14px;letter-spacing:.08em;color:var(--gray);z-index:3;text-transform:uppercase}\n.foot .izq{max-width:560px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.foot .num{position:absolute;left:50%;transform:translateX(-50%);cursor:pointer}\n.foot .der{display:flex;align-items:center;gap:16px}\n.foot img{height:36px;max-width:220px;object-fit:contain}\n.chipv{font-family:var(--mono);font-size:15px;font-weight:700;padding:4px 10px;border-radius:9px;border:1px solid rgba(72,84,88,.2);background:rgba(255,255,255,.8);color:var(--steel);cursor:pointer;display:inline-flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0}\n.chipv::before{content:\"\";width:9px;height:9px;border-radius:50%;background:#2fa36b}\n.chipv.off{color:#B42318;border-color:rgba(180,35,24,.35)}\n.chipv.off::before{background:#D92D20}\n.chipv.espera::before{background:#F79009}\n\n/* Votación, nube y preguntas */\n.envivo{display:flex;gap:60px;align-items:center}\n.envivo .zona{flex:1;min-width:0}\n.tally{display:flex;flex-direction:column;gap:.6em}\n.trow{display:grid;grid-template-columns:minmax(200px,36%) 1fr 2.6em auto;align-items:center;gap:.65em}\n.trow .lb{font-size:.86em;font-weight:700;line-height:1.2;display:flex;gap:.5em}\n.trow .lb b{font-family:var(--mono);color:var(--c1);flex:none}\n.track{height:1.8em;border-radius:.5em;background:rgba(72,84,88,.08);overflow:hidden;position:relative}\n.fill{height:100%;width:0;border-radius:.5em;background:linear-gradient(90deg,var(--c1),var(--c2));transition:width .9s var(--ease);position:relative;overflow:hidden}\n.fill::after{content:\"\";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.45) 50%,transparent 80%);transform:translateX(-100%);animation:shine 2.6s ease-in-out infinite}\n@keyframes shine{to{transform:translateX(100%)}}\n.trow.win .fill{box-shadow:0 0 24px rgba(var(--c1-rgb),.5)}\n.trow .ct{font-size:1.2em;font-weight:700;text-align:right;font-family:var(--mono)}\n.ctl{display:none;gap:6px}\n.ctl button{width:34px;height:34px;border-radius:10px;border:1px solid rgba(72,84,88,.25);background:#fff;font-size:20px;cursor:pointer;color:var(--ink)}\n.sinred .ctl,.sinapi .ctl{display:flex}\n.total{font-family:var(--mono);font-size:22px;color:var(--gray);display:flex;align-items:center;gap:14px;margin-top:22px}\n.live{display:inline-flex;align-items:center;gap:8px;color:var(--c1);font-weight:700;font-family:var(--mono);letter-spacing:.08em}\n.live::before{content:\"\";width:12px;height:12px;border-radius:50%;background:var(--c1);box-shadow:0 0 0 0 rgba(var(--c1-rgb),.6);animation:ping 1.4s ease-out infinite}\n@keyframes ping{to{box-shadow:0 0 0 14px rgba(var(--c1-rgb),0)}}\n.sinred .total .live,.sinapi .total .live{display:none}\n.unirse{width:310px;flex:none;text-align:center}\n.unirse .live{font-size:21px;justify-content:center;display:flex;margin-top:10px}\n.sinapi .unirse{display:none}\n.qrframe{position:relative;padding:14px;display:inline-block}\n.qrframe i{position:absolute;width:30px;height:30px;border-color:var(--c1);border-style:solid;animation:pulsoQr 2.2s ease-in-out infinite}\n.qrframe i:nth-child(1){left:0;top:0;border-width:4px 0 0 4px}.qrframe i:nth-child(2){right:0;top:0;border-width:4px 4px 0 0}\n.qrframe i:nth-child(3){left:0;bottom:0;border-width:0 0 4px 4px}.qrframe i:nth-child(4){right:0;bottom:0;border-width:0 4px 4px 0}\n@keyframes pulsoQr{50%{opacity:.35}}\n.qrimg{width:250px;height:250px;display:block}\n.qrimg svg{width:100%;height:100%;display:block}\n.url{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--steel);text-align:center;margin-top:6px;overflow-wrap:anywhere}\n.nube{height:440px;display:flex;flex-wrap:wrap;gap:4px 26px;align-items:center;justify-content:center;align-content:center;overflow:hidden;position:relative}\n.nube .ficha{font-weight:700;line-height:1.1;letter-spacing:-.01em;transition:font-size .6s var(--ease);animation:entra .5s var(--ease) both;white-space:nowrap}\n.nube .n0{color:var(--steel)}.nube .n1{color:var(--c1)}.nube .n2{color:#7d898d}\n.nube .top{background:linear-gradient(90deg,var(--c1),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}\n.nubeVacia{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--gray);text-align:center;padding:0 40px}\n@keyframes entra{from{opacity:0;transform:translateY(14px)}}\n.pregs{list-style:none;display:flex;flex-direction:column;gap:14px}\n.pregs li{display:flex;gap:16px;align-items:flex-start;background:rgba(255,255,255,.95);border:1px solid rgba(72,84,88,.16);border-radius:16px;padding:16px 20px;font-size:25px;line-height:1.3;box-shadow:0 10px 28px rgba(72,84,88,.1);overflow-wrap:anywhere;animation:entra .5s var(--ease) both}\n.pregs li b{flex:none;color:var(--c1);font-family:var(--mono);font-size:21px;padding-top:3px}\n.pregsVacia{font-size:28px;color:var(--gray);line-height:1.4}\n#avisoRed{position:absolute;right:80px;top:18px;font-family:var(--mono);font-size:14px;color:var(--gray);display:none;z-index:4}\n.sinred #avisoRed{display:block}\n\n/* Capas del presentador */\n#blanco{position:fixed;inset:0;background:#fff;z-index:30;display:none}\n#blanco.on{display:block}\n#notes{position:fixed;left:16px;right:16px;bottom:16px;background:rgba(27,31,33,.95);color:#fff;border-radius:16px;padding:18px 22px;font-size:17px;line-height:1.5;display:none;z-index:9;max-height:42vh;overflow:auto}\n#notes .hd{display:flex;justify-content:space-between;color:var(--c2);font-weight:700;margin-bottom:8px;font-family:var(--mono)}\n#nx{white-space:pre-wrap}\n#nsig{margin-top:10px;color:#aab4b8;font-family:var(--mono);font-size:14px}\n#help{position:fixed;top:12px;right:16px;font-size:13px;color:#999;z-index:8;transition:opacity 1s;font-family:var(--mono)}\n#prog{position:fixed;left:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--c1),var(--c2));box-shadow:0 0 12px rgba(var(--c1-rgb),.6);transition:width .5s var(--ease);z-index:7}\n.capa{position:fixed;inset:0;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:10;display:none;align-items:center;justify-content:center;padding:20px}\n.capa.on{display:flex}\n.capa .box{width:760px;max-width:100%;max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,.15);border:1px solid #eee}\n.capa h3{font-size:24px;margin-bottom:6px}\n.capa p{color:#666;font-size:15px;margin-bottom:14px;line-height:1.4}\n.capa label{display:block;font-size:14px;font-weight:700;margin:12px 0 6px}\n.capa input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #ccc;font-size:16px;font-family:inherit}\n.capa .acts{display:flex;gap:12px;margin-top:22px;justify-content:flex-end;flex-wrap:wrap}\n.btn{background:linear-gradient(90deg,var(--c1),var(--c2));color:#fff;border:0;border-radius:999px;padding:12px 22px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}\n.btn.ghost{background:#fff;color:var(--ink);border:1px solid rgba(72,84,88,.25)}\n.cfgqr{display:flex;gap:30px;margin-top:18px}\n.cfgqr figure{flex:1;text-align:center}\n.cfgqr .qrimg{width:190px;height:190px;margin:0 auto 8px}\n.cfgqr figcaption{font-size:14px;color:#666;line-height:1.35;overflow-wrap:anywhere}\n#indiceLista{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}\n#indiceLista button{display:flex;gap:12px;align-items:baseline;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid #e4e7e8;background:#fff;font:inherit;font-size:15px;cursor:pointer;color:var(--ink)}\n#indiceLista button b{font-family:var(--mono);color:var(--c1);flex:none}\n#indiceLista button.act{border-color:var(--c1);box-shadow:0 0 0 3px rgba(var(--c1-rgb),.12)}\n\n@media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation:none!important}}\n@media print{\n  @page{size:1600px 900px;margin:0}\n  html,body{height:auto;overflow:visible}\n  #viewport{position:static;display:block}\n  #stage{transform:none!important;height:auto}\n  .slide{position:relative;inset:auto;height:900px;opacity:1!important;visibility:visible!important;transform:none!important;filter:none!important;break-after:page;page-break-after:always;overflow:hidden}\n  .a,.f,.w>span{opacity:1!important;transform:none!important;filter:none!important}\n  #bg,.glow,.gridbg,.foot,#prog,#help,#notes,.capa,#blanco,#avisoRed,.unirse,.ctl{display:none!important}\n}\n","js":"/* Motor de la presentación: navegación, pasos, notas, reloj y, si se activó, el modo en vivo. */\n(function(){\n'use strict';\nvar C=JSON.parse(document.getElementById('charla').textContent),PRE='charla_'+C.id+'_';\nvar LS={get:function(k){try{return localStorage.getItem(PRE+k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(PRE+k,v)}catch(e){}}};\nfunction $(i){return document.getElementById(i)}\nfunction cada(sel,f,raiz){[].forEach.call((raiz||document).querySelectorAll(sel),f)}\nvar stage=$('stage'),calma=matchMedia('(prefers-reduced-motion:reduce)').matches;\nvar est=getComputedStyle(document.documentElement),C1=(est.getPropertyValue('--c1-rgb')||'255,51,0').trim(),C2=(est.getPropertyValue('--c2-rgb')||'255,153,0').trim();\nfunction fit(){var s=Math.min(innerWidth/1600,innerHeight/900);stage.style.transform='scale('+s+')'}\naddEventListener('resize',fit);fit();\nvar slides=[].slice.call(document.querySelectorAll('.slide')),cur=0,step=0,VIVO=!!C.vivo;\n\n/* red de partículas del fondo */\nvar bg=$('bg'),bx=bg.getContext('2d'),P=[],KB=1;\nfunction bgSize(){var s=Math.min(innerWidth/1600,innerHeight/900),d=Math.min(window.devicePixelRatio||1,2);KB=Math.max(.4,s*d);bg.width=Math.round(1600*KB);bg.height=Math.round(900*KB);\n if(!P.length)for(var i=0;i\u003c58;i++)P.push({x:Math.random()*1600,y:Math.random()*900,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()\u003c.12?2.6:1.6,c:Math.random()\u003c.12})}\naddEventListener('resize',bgSize);bgSize();\n(function loop(){bx.setTransform(KB,0,0,KB,0,0);bx.clearRect(0,0,1600,900);var i,j,p;\n for(i=0;i\u003cP.length;i++){p=P[i];p.x+=p.vx;p.y+=p.vy;if(p.x\u003c0||p.x>1600)p.vx*=-1;if(p.y\u003c0||p.y>900)p.vy*=-1}\n for(i=0;i\u003cP.length;i++)for(j=i+1;j\u003cP.length;j++){var a=P[i],b=P[j],dx=a.x-b.x,dy=a.y-b.y,d=dx*dx+dy*dy;if(d\u003c16000){bx.strokeStyle='rgba(72,84,88,'+(.10*(1-d/16000))+')';bx.lineWidth=1;bx.beginPath();bx.moveTo(a.x,a.y);bx.lineTo(b.x,b.y);bx.stroke()}}\n for(i=0;i\u003cP.length;i++){p=P[i];bx.fillStyle=p.c?'rgba('+C1+',.55)':'rgba(72,84,88,.28)';bx.beginPath();bx.arc(p.x,p.y,p.r,0,7);bx.fill()}\n if(!calma)requestAnimationFrame(loop)})();\n\n/* títulos palabra por palabra y etiqueta que se escribe sola */\ncada('.t',function(h){var nodos=[].slice.call(h.childNodes),k=0;h.textContent='';\n function pieza(contenido){var w=document.createElement('span'),inn=document.createElement('span');w.className='w';inn.style.transitionDelay=(k++*.05+.1)+'s';if(typeof contenido==='string')inn.textContent=contenido;else inn.appendChild(contenido);w.appendChild(inn);h.appendChild(w)}\n nodos.forEach(function(n){if(n.nodeType===3){n.textContent.split(/(\\s+)/).forEach(function(t){if(!t)return;if(/^\\s+$/.test(t))h.appendChild(document.createTextNode(' '));else pieza(t)})}else pieza(n)})});\nvar typeT;\nfunction typeK(s){var k=s.querySelector('.kicker[data-text]');if(!k)return;clearInterval(typeT);var tx=k.dataset.text,i=0;k.textContent='';var sp=document.createElement('span'),c=document.createElement('i');c.className='cur';k.appendChild(sp);k.appendChild(c);\n if(calma){sp.textContent=tx;return}\n typeT=setInterval(function(){sp.textContent=tx.slice(0,++i);if(i>=tx.length)clearInterval(typeT)},22)}\n\n/* campo de puntos de las diapositivas destacadas */\nfunction puntos(cv){var cx=cv.getContext('2d'),pts=[],x,y,n=0,s=cv.closest('.slide');for(y=36;y\u003c900;y+=24)for(x=36;x\u003c1600;x+=24)pts.push([x,y]);pts.sort(function(){return Math.random()-.5});cx.clearRect(0,0,1600,900);\n (function f(){if(!s.classList.contains('active'))return;for(var k=0;k\u003c36&&n\u003cpts.length;k++,n++){var p=pts[n];cx.fillStyle=n%11===0?'rgb('+C1+')':(n%7===0?'rgb('+C2+')':'#C9CED0');cx.beginPath();cx.arc(p[0],p[1],3.6,0,7);cx.fill()}if(n\u003cpts.length&&!calma)requestAnimationFrame(f)})()}\n\n/* números que cuentan */\nfunction fmt(v,e){var d=+(e.dataset.dec||0);return v.toLocaleString(e.dataset.loc==='en'?'en-US':'es-AR',{minimumFractionDigits:d,maximumFractionDigits:d})}\nfunction contar(s){cada('[data-count]',function(e){var fin=+e.dataset.count,t0=performance.now();if(calma){e.textContent=fmt(fin,e);return}\n (function f(t){var u=Math.min(1,(t-t0)/1100);e.textContent=fmt(fin*(1-Math.pow(1-u,3)),e);if(u\u003c1&&s.classList.contains('active'))requestAnimationFrame(f);else e.textContent=fmt(fin,e)})(t0)},s)}\n\n/* si el contenido no entra en la diapositiva, se achica hasta que entre */\nfunction ajustar(s){var c=s.querySelector('.cuerpo'),i=c&&c.querySelector('.in');if(!i||c.dataset.listo)return;var k=1;i.style.setProperty('--k',k);\n while(k>.4&&(i.offsetHeight>c.clientHeight+2||i.scrollWidth>c.clientWidth+2)){k-=.04;i.style.setProperty('--k',k.toFixed(2))}\n c.classList.toggle('desborda',i.offsetHeight>c.clientHeight+2);c.dataset.listo='1'}\nfunction ajustarTodo(){slides.forEach(function(s){var c=s.querySelector('.cuerpo');if(c)delete c.dataset.listo;ajustar(s)})}\naddEventListener('load',ajustarTodo);\n\n/* barras de votación: los votos de la sala se suman a los cargados a mano con + y − */\nvar T={};\ncada('.tally',function(t){var k=t.dataset.key,def=C.encuestas[k];if(!def)return;var guardado={};try{guardado=JSON.parse(LS.get('t'+k)||'{}')}catch(e){}\n var v={},sv={};T[k]={el:t,v:v,s:sv};\n def.opciones.forEach(function(o){v[o.id]=guardado[o.id]||0;sv[o.id]=0;var r=document.createElement('div');r.className='trow';r.dataset.o=o.id;\n  r.innerHTML='\u003cdiv class=\"lb\">\u003cb>\u003c/b>\u003cspan>\u003c/span>\u003c/div>\u003cdiv class=\"track\">\u003cdiv class=\"fill\">\u003c/div>\u003c/div>\u003cdiv class=\"ct\">0\u003c/div>\u003cdiv class=\"ctl\">\u003cbutton data-d=\"-1\" aria-label=\"Restar\">−\u003c/button>\u003cbutton data-d=\"1\" aria-label=\"Sumar\">+\u003c/button>\u003c/div>';\n  r.querySelector('b').textContent=o.id;r.querySelector('span').textContent=o.texto;t.appendChild(r)});\n t.addEventListener('click',function(e){e.stopPropagation();var b=e.target.closest('button');if(!b)return;var o=b.closest('.trow').dataset.o;v[o]=Math.max(0,v[o]+(+b.dataset.d));LS.set('t'+k,JSON.stringify(v));renderT(k)});renderT(k)});\nfunction votos(k,o){return T[k].v[o]+(T[k].s[o]||0)}\nfunction renderT(k){var t=T[k],vals=Object.keys(t.v).map(function(o){return votos(k,o)}),tot=vals.reduce(function(a,b){return a+b},0),mx=Math.max.apply(null,vals);\n cada('.trow',function(r){var v=votos(k,r.dataset.o);r.querySelector('.fill').style.width=(tot?v/tot*100:0)+'%';r.querySelector('.ct').textContent=v;r.classList.toggle('win',v>0&&v===mx)},t.el);\n cada('[data-total=\"'+k+'\"]',function(e){e.textContent=tot});\n cada('[data-plural=\"'+k+'\"]',function(e){e.textContent=tot===1?'persona votó':'personas votaron'})}\n\n/* modo en vivo: la presentación habla con el servidor de la sala */\nvar base='',token=null,seq=0,conectado=false,fallos=0,indiceListo=false,sincronizando=false,cedido=false,SID=Math.random().toString(36).slice(2),relojInicio=+(LS.get('reloj')||0)||null,cfg=$('cfg');\nfunction api(r,d){if(!base)return Promise.reject(new Error('Falta la dirección del servidor'));var h={},o={headers:h,cache:'no-store'};if(token)h.Authorization='Bearer '+token;if(d){o.method='POST';h['Content-Type']='application/json';o.body=JSON.stringify(d)}\n return fetch(base+'/api/'+r,o).then(function(x){return x.json().then(function(j){if(!x.ok){var e=new Error(j.error||'Error');e.estado=x.status;throw e}return j})})}\nfunction red(ok){fallos=ok?0:fallos+1;document.body.classList.toggle('sinred',!!base&&fallos>=2)}\nfunction pintarAcceso(){document.body.classList.toggle('sinapi',!base);if(!base)return;var corta=base.replace(/^https?:\\/\\//,'');\n cada('[data-qr]',function(e){try{e.innerHTML=qrSvg(base+(e.dataset.qr==='control'?'/control':'/'))}catch(x){e.textContent=''}});\n cada('[data-url]',function(e){e.textContent=corta+(e.dataset.url==='control'?'/control':'')})}\nfunction encuestasDe(s){return s.dataset.encuesta?[s.dataset.encuesta]:[]}\nvar repT=null;function reportar(){if(!VIVO)return;clearTimeout(repT);repT=setTimeout(enviarEstado,40)}\nfunction enviarEstado(){if(!token||!conectado)return;var s=slides[cur],d={charla:C.id,diapositiva:cur+1,paso:step,pasos:+(s.dataset.steps||0),total:slides.length,titulo:s.dataset.titulo||'',notas:s.dataset.notes||'',encuestas:encuestasDe(s),momento:s.dataset.momento||''};\n if(relojInicio)d.relojInicio=new Date(relojInicio).toISOString();\n if(!indiceListo)d.indice=slides.map(function(x,i){return {n:i+1,titulo:x.dataset.titulo||''}});\n api('presentador',d).then(function(){indiceListo=true;red(true)}).catch(function(e){red(false);if(e.estado===401)salirSesion()})}\nfunction ejecutar(c){if(c.tipo==='siguiente')next();else if(c.tipo==='anterior')prev();else if(c.tipo==='ir')go((+c.valor)-1);else if(c.tipo==='blanco')$('blanco').classList.toggle('on',!!c.valor);else if(c.tipo==='reloj')iniciarReloj();else if(c.tipo==='limpio')limpioLocal(c.valor);else if(c.tipo==='tomar'&&c.valor!==SID){cedido=true;conectado=false;estadoCfg()}}\nfunction limpioLocal(id){for(var k in T){if(id&&k!==id)continue;for(var o in T[k].v){T[k].v[o]=0;T[k].s[o]=0}LS.set('t'+k,'{}');renderT(k)}\n if(!id){relojInicio=null;LS.set('reloj','')}leer();reportar()}\nfunction sincro(){if(sincronizando||!token)return;sincronizando=true;(function ciclo(){if(!token||cedido){sincronizando=false;return}\n api('sincro?desde='+seq).then(function(r){red(true);r.comandos.forEach(function(c){seq=c.seq;ejecutar(c)});ciclo()}).catch(function(e){red(false);if(e.estado===401){sincronizando=false;salirSesion();return}setTimeout(ciclo,1800)})})()}\nfunction salirSesion(){token=null;conectado=false;LS.set('token','');estadoCfg()}\nfunction conectar(){if(!base||!token){estadoCfg();return}\n api('definir',{id:C.id,titulo:C.titulo,encuestas:C.encuestas}).then(function(){return api('ultimo')}).then(function(r){seq=r.seq;conectado=true;cedido=false;indiceListo=false;red(true);estadoCfg();api('comando',{tipo:'tomar',valor:SID}).catch(function(){});sincro();enviarEstado()})\n  .catch(function(e){if(e.estado===401)salirSesion();else{red(false);estadoCfg();setTimeout(conectar,3000)}})}\nfunction iniciarReloj(){relojInicio=Date.now();LS.set('reloj',relojInicio);t0=relojInicio;reportar()}\nfunction leerResultados(k){api('resultados?e='+k+'&t='+Math.floor(Date.now()/1000)).then(function(r){red(true);if(r.conteos[k]&&T[k]){T[k].s=r.conteos[k];renderT(k)}}).catch(function(){red(false)})}\nvar nubes={};\nfunction leerNube(k,el){api('palabras?e='+k+'&t='+Math.floor(Date.now()/1000)).then(function(r){red(true);var l=r.palabras,mx=l.length?l[0].n:1,vistas={},tot=0,mapa=nubes[k]||(nubes[k]={}),orden=[];\n  el.querySelector('.nubeVacia').style.display=l.length?'none':'flex';\n  l.forEach(function(w,i){if(i%2)orden.push(w);else orden.unshift(w)});\n  orden.forEach(function(w){tot+=w.n;vistas[w.clave]=1;var s=mapa[w.clave];if(s)s.style.animation='none';else{s=document.createElement('span');s.className='ficha n'+(w.clave.length%3);mapa[w.clave]=s}s.textContent=w.texto;s.style.fontSize=Math.round(26+84*Math.sqrt(w.n/mx))+'px';s.classList.toggle('top',w===l[0]);el.appendChild(s)});\n  Object.keys(mapa).forEach(function(c){if(!vistas[c]){mapa[c].remove();delete mapa[c]}});\n  cada('[data-total=\"'+k+'\"]',function(e){e.textContent=tot})}).catch(function(){red(false)})}\nfunction leerPreguntas(ol){api('preguntas?t='+Math.floor(Date.now()/1000)).then(function(r){var l=r.preguntas.filter(function(p){return p.estado==='aprobada'}).slice(0,5),f=JSON.stringify(l);if(f===ol.dataset.f)return;\n  var primera=!ol.dataset.f;ol.dataset.f=f;ol.textContent='';l.forEach(function(p){var li=document.createElement('li'),b=document.createElement('b'),t=document.createElement('span');b.textContent='▲'+p.apoyos;t.textContent=p.texto;li.appendChild(b);li.appendChild(t);if(!primera)li.style.animation='none';ol.appendChild(li)});\n  var v=ol.parentNode.querySelector('.pregsVacia');if(v)v.style.display=l.length?'none':'block'}).catch(function(){})}\nvar tic=0;\nfunction leer(){if(!VIVO||!base||document.hidden)return;var s=slides[cur],k=s.dataset.encuesta,n=s.querySelector('.nube'),ol=s.querySelector('.pregs');tic++;\n if(k&&n)leerNube(k,n);else if(k)leerResultados(k);\n if(ol&&tic%2===0)leerPreguntas(ol)}\n\n/* panel de conexión */\nfunction estadoCfg(){if(!VIVO)return;var e=$('cfgEstado'),ch=$('chipVivo');$('retomar').style.display=cedido?'':'none';$('cfgSalir').style.display=token?'':'none';$('cfgEntrar').style.display=token?'none':'';$('cfgQrs').style.display=base?'flex':'none';\n e.textContent=!base?'Sin servidor: las votaciones se cuentan a mano con + y −. Para que la sala vote desde el celular, pegá la dirección de tu servidor.':!token?'Ingresá tu PIN para que los celulares sigan la presentación.':cedido?'Otra pantalla tomó el control de la charla.':conectado?'Conectada. Los celulares siguen la presentación.':'Conectando…';\n ch.textContent=!base?'Sin servidor':!token?'Sin conectar':cedido?'Otra pantalla':conectado?'En vivo':'Conectando';ch.className='chipv'+(!base||!token||cedido?' off':conectado?'':' espera')}\nfunction abrirCfg(){if(!VIVO)return;$('cfgUrl').value=base;estadoCfg();cfg.classList.add('on');setTimeout(function(){(base&&!token?$('cfgPin'):$('cfgUrl')).focus()},60)}\nfunction entrar(){var u=$('cfgUrl').value.trim().replace(/\\/+$/,''),pin=$('cfgPin').value.trim(),m=$('cfgEstado');if(u&&!/^https?:\\/\\//i.test(u))u='https://'+u;\n if(u!==base){base=u;LS.set('api',base);token=null;conectado=false;LS.set('token','');pintarAcceso()}\n if(!base||!pin){estadoCfg();return}\n m.textContent='Verificando…';api('login',{pin:pin}).then(function(r){token=r.token;LS.set('token',token);$('cfgPin').value='';conectar();setTimeout(function(){if(conectado)cfg.classList.remove('on')},1200)}).catch(function(e){$('cfgPin').value='';m.textContent=e.estado?e.message:'No se pudo conectar con el servidor. Revisá la dirección e internet.'})}\nif(VIVO){base=(LS.get('api')||C.api||'').replace(/\\/+$/,'');token=LS.get('token')||null;pintarAcceso();\n $('cfgForm').addEventListener('submit',function(ev){ev.preventDefault();entrar()});\n $('chipVivo').addEventListener('click',function(e){e.stopPropagation();abrirCfg()});\n $('retomar').onclick=function(){cedido=false;conectar()};\n $('cfgSalir').onclick=salirSesion;\n $('cerrarCfg').onclick=function(){cfg.classList.remove('on')};\n $('resetV').onclick=function(){if(!confirm('Se borran los votos, las palabras y las preguntas. ¿Seguro?'))return;limpioLocal(null);if(token)api('reiniciar',{}).then(enviarEstado).catch(function(){})};\n cfg.addEventListener('click',function(e){e.stopPropagation();if(e.target===cfg)cfg.classList.remove('on')});\n setInterval(leer,1000);setInterval(enviarEstado,8000)}\n\n/* índice para saltar a cualquier diapositiva */\nvar indice=$('indice');\nfunction abrirIndice(){var l=$('indiceLista');l.textContent='';slides.forEach(function(s,i){var b=document.createElement('button'),n=document.createElement('b'),t=document.createElement('span');b.type='button';n.textContent=('0'+(i+1)).slice(-2);t.textContent=s.dataset.titulo||'';b.appendChild(n);b.appendChild(t);if(i===cur)b.className='act';b.onclick=function(){indice.classList.remove('on');go(i)};l.appendChild(b)});indice.classList.add('on')}\nindice.addEventListener('click',function(e){e.stopPropagation();if(e.target===indice)indice.classList.remove('on')});\n$('num').addEventListener('click',function(e){e.stopPropagation();abrirIndice()});\n\n/* navegación */\nfunction applyStep(){var s=slides[cur];cada('.f',function(e){e.classList.toggle('on',+e.dataset.f\u003c=step)},s);reportar()}\nfunction cambiar(n,st){slides[cur].classList.remove('active');cur=n;step=st||0;var s=slides[cur];s.classList.add('active');\n typeK(s);cada('canvas.puntitos',puntos,s);contar(s);ajustar(s);applyStep();\n $('num').textContent=('0'+(cur+1)).slice(-2)+' / '+('0'+slides.length).slice(-2);\n $('prog').style.width=((cur+1)/slides.length*100)+'%';\n $('nt').textContent='Diapositiva '+(cur+1)+' de '+slides.length;$('nx').textContent=s.dataset.notes||'Sin notas en esta diapositiva.';\n $('nsig').textContent=cur\u003cslides.length-1?'Sigue: '+(slides[cur+1].dataset.titulo||''):'Última diapositiva';\n leer();try{history.replaceState(null,'','#'+(cur+1))}catch(e){}}\nvar enCurso=null;\nfunction terminar(){if(!enCurso)return;var x=enCurso;enCurso=null;clearTimeout(x.t);x.f()}\nfunction go(n,st){n=Math.max(0,Math.min(slides.length-1,n));terminar();if(n===cur){step=st||0;applyStep();return}\n if(calma||document.hidden||Math.abs(n-cur)>1){cambiar(n,st);return}\n var sale=slides[cur];sale.classList.add('sale');enCurso={t:setTimeout(terminar,290),f:function(){sale.classList.remove('sale');cambiar(n,st)}}}\nfunction next(){terminar();if(cur===0&&step===0&&!relojInicio)iniciarReloj();var max=+(slides[cur].dataset.steps||0);if(step\u003cmax){step++;applyStep()}else if(cur\u003cslides.length-1)go(cur+1)}\nfunction prev(){terminar();if(step>0){step--;applyStep()}else if(cur>0)go(cur-1,+(slides[cur-1].dataset.steps||0))}\nwindow.__go=go;window.__estado=function(){return {cur:cur+1,step:step,total:slides.length}};\nvar t0=relojInicio||Date.now();\nfunction capaAbierta(){return document.querySelector('.capa.on')}\naddEventListener('keydown',function(e){var c=capaAbierta();if(c){if(e.key==='Escape')c.classList.remove('on');return}\n if(e.metaKey||e.ctrlKey||e.altKey)return;\n if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;\n var k=e.key;\n if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].indexOf(k)>=0){e.preventDefault();next()}\n else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(k)>=0){e.preventDefault();prev()}\n else if(k==='Home')go(0);else if(k==='End')go(slides.length-1);\n else if(k==='f'||k==='F'){if(document.fullscreenElement)document.exitFullscreen();else if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(function(){})}\n else if(k==='n'||k==='N'){var nn=$('notes');nn.style.display=nn.style.display==='block'?'none':'block'}\n else if(k==='g'||k==='G')abrirIndice();\n else if(k==='c'||k==='C')abrirCfg();\n else if(k==='t'||k==='T'){relojInicio=Date.now();LS.set('reloj',relojInicio);t0=relojInicio;reportar()}\n else if(k==='b'||k==='B'||k==='.')$('blanco').classList.toggle('on')});\n$('viewport').addEventListener('click',function(e){if(e.target.closest('input,label,button,a,.tally,.capa'))return;next()});\nvar tx=null;\naddEventListener('touchstart',function(e){tx=e.touches.length===1?e.touches[0].clientX:null},{passive:true});\naddEventListener('touchend',function(e){if(tx===null||capaAbierta())return;var d=e.changedTouches[0].clientX-tx;tx=null;if(d>60)prev();else if(d\u003c-60)next()},{passive:true});\naddEventListener('beforeprint',function(){cada('.kicker[data-text]',function(k){k.textContent=k.dataset.text})});\nsetInterval(function(){var s=Math.floor((Date.now()-t0)/1000);$('clock').textContent=('0'+Math.floor(s/60)).slice(-2)+':'+('0'+s%60).slice(-2)},1000);\nsetTimeout(function(){$('help').style.opacity=0},7000);\nvar hh=parseInt(location.hash.slice(1),10);cur=isNaN(hh)?0:Math.max(0,Math.min(slides.length-1,hh-1));cambiar(cur,0);\nif(VIVO){conectar();estadoCfg()}\n})();\n","qr":"// Generador de códigos QR sin dependencias: modo byte, corrección M, versiones 1 a 9\n// (hasta 180 caracteres, de sobra para una dirección web).\nconst QR_EC = [0, 10, 16, 26, 18, 24, 16, 18, 22, 22];\nconst QR_BLOQUES = [0, 1, 1, 1, 2, 2, 4, 4, 4, 5];\nconst QR_TOTAL = [0, 26, 44, 70, 100, 134, 172, 196, 242, 292];\nconst QR_MASCARAS = [\n  (x, y) => (x + y) % 2 === 0,\n  (x, y) => y % 2 === 0,\n  (x, y) => x % 3 === 0,\n  (x, y) => (x + y) % 3 === 0,\n  (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0,\n  (x, y) => ((x * y) % 2) + ((x * y) % 3) === 0,\n  (x, y) => (((x * y) % 2) + ((x * y) % 3)) % 2 === 0,\n  (x, y) => (((x + y) % 2) + ((x * y) % 3)) % 2 === 0,\n];\n\nfunction qrMul(x, y) {\n  let z = 0;\n  for (let i = 7; i >= 0; i--) {\n    z = (z \u003c\u003c 1) ^ ((z >>> 7) * 0x11d);\n    z ^= ((y >>> i) & 1) * x;\n  }\n  return z;\n}\n\nfunction qrDivisor(grado) {\n  const r = new Array(grado).fill(0);\n  r[grado - 1] = 1;\n  let raiz = 1;\n  for (let i = 0; i \u003c grado; i++) {\n    for (let j = 0; j \u003c grado; j++) {\n      r[j] = qrMul(r[j], raiz);\n      if (j + 1 \u003c grado) r[j] ^= r[j + 1];\n    }\n    raiz = qrMul(raiz, 2);\n  }\n  return r;\n}\n\nfunction qrResto(datos, div) {\n  const r = div.map(() => 0);\n  for (const b of datos) {\n    const f = b ^ r.shift();\n    r.push(0);\n    for (let i = 0; i \u003c div.length; i++) r[i] ^= qrMul(div[i], f);\n  }\n  return r;\n}\n\nfunction qrPenalidad(m, n) {\n  let p = 0;\n  let oscuros = 0;\n  const PATRON = [1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0];\n  for (let a = 0; a \u003c n; a++) {\n    for (const fila of [true, false]) {\n      let racha = 1;\n      for (let b = 0; b \u003c n; b++) {\n        const v = fila ? m[a][b] : m[b][a];\n        if (b > 0) {\n          const ant = fila ? m[a][b - 1] : m[b - 1][a];\n          if (v === ant) {\n            racha++;\n            if (racha === 5) p += 3;\n            else if (racha > 5) p++;\n          } else racha = 1;\n        }\n        if (b + 11 \u003c= n) {\n          let directo = true;\n          let inverso = true;\n          for (let k = 0; k \u003c 11; k++) {\n            const w = fila ? m[a][b + k] : m[b + k][a];\n            if (w !== PATRON[k]) directo = false;\n            if (w !== PATRON[10 - k]) inverso = false;\n          }\n          if (directo) p += 40;\n          if (inverso) p += 40;\n        }\n      }\n    }\n  }\n  for (let y = 0; y \u003c n; y++) {\n    for (let x = 0; x \u003c n; x++) {\n      oscuros += m[y][x];\n      if (x + 1 \u003c n && y + 1 \u003c n && m[y][x] === m[y][x + 1] && m[y][x] === m[y + 1][x] && m[y][x] === m[y + 1][x + 1]) p += 3;\n    }\n  }\n  const total = n * n;\n  p += (Math.ceil(Math.abs(oscuros * 20 - total * 10) / total) - 1) * 10;\n  return p;\n}\n\n// Devuelve { n, m } con la matriz de módulos (1 = oscuro). `forzarMascara` es solo para pruebas.\nexport function qrMatriz(texto, forzarMascara) {\n  const bytes = Array.from(new TextEncoder().encode(texto));\n  let ver = 1;\n  while (ver \u003c= 9 && bytes.length > QR_TOTAL[ver] - QR_EC[ver] * QR_BLOQUES[ver] - 2) ver++;\n  if (ver > 9) throw new Error('El texto es demasiado largo para el código QR.');\n  const nb = QR_BLOQUES[ver];\n  const ec = QR_EC[ver];\n  const total = QR_TOTAL[ver];\n  const nDatos = total - ec * nb;\n\n  const bits = [];\n  const poner = (v, largo) => { for (let i = largo - 1; i >= 0; i--) bits.push((v >>> i) & 1); };\n  poner(4, 4);\n  poner(bytes.length, 8);\n  bytes.forEach((b) => poner(b, 8));\n  poner(0, Math.min(4, nDatos * 8 - bits.length));\n  poner(0, (8 - (bits.length % 8)) % 8);\n  for (let relleno = 0xec; bits.length \u003c nDatos * 8; relleno ^= 0xec ^ 0x11) poner(relleno, 8);\n  const datos = [];\n  for (let i = 0; i \u003c bits.length; i += 8) {\n    let v = 0;\n    for (let k = 0; k \u003c 8; k++) v = (v \u003c\u003c 1) | bits[i + k];\n    datos.push(v);\n  }\n\n  const cortos = nb - (total % nb);\n  const largoCorto = Math.floor(total / nb);\n  const div = qrDivisor(ec);\n  const bloques = [];\n  let k = 0;\n  for (let i = 0; i \u003c nb; i++) {\n    const d = datos.slice(k, k + largoCorto - ec + (i \u003c cortos ? 0 : 1));\n    k += d.length;\n    bloques.push({ d, e: qrResto(d, div) });\n  }\n  const flujo = [];\n  for (let i = 0; i \u003c= largoCorto - ec; i++) bloques.forEach((b) => { if (i \u003c b.d.length) flujo.push(b.d[i]); });\n  for (let i = 0; i \u003c ec; i++) bloques.forEach((b) => flujo.push(b.e[i]));\n\n  const n = ver * 4 + 17;\n  const m = [];\n  const fn = [];\n  for (let i = 0; i \u003c n; i++) {\n    m.push(new Array(n).fill(0));\n    fn.push(new Array(n).fill(false));\n  }\n  const fijo = (x, y, v) => { m[y][x] = v ? 1 : 0; fn[y][x] = true; };\n\n  for (let i = 0; i \u003c n; i++) {\n    fijo(6, i, i % 2 === 0);\n    fijo(i, 6, i % 2 === 0);\n  }\n  for (const [cx, cy] of [[3, 3], [n - 4, 3], [3, n - 4]]) {\n    for (let dy = -4; dy \u003c= 4; dy++) {\n      for (let dx = -4; dx \u003c= 4; dx++) {\n        const x = cx + dx;\n        const y = cy + dy;\n        const d = Math.max(Math.abs(dx), Math.abs(dy));\n        if (x >= 0 && x \u003c n && y >= 0 && y \u003c n) fijo(x, y, d !== 2 && d !== 4);\n      }\n    }\n  }\n  if (ver > 1) {\n    const na = Math.floor(ver / 7) + 2;\n    const paso = Math.ceil((ver * 4 + 4) / (na * 2 - 2)) * 2;\n    const pos = [6];\n    for (let q = n - 7; pos.length \u003c na; q -= paso) pos.splice(1, 0, q);\n    pos.forEach((cx, i) => pos.forEach((cy, j) => {\n      if ((i === 0 && j === 0) || (i === 0 && j === na - 1) || (i === na - 1 && j === 0)) return;\n      for (let dy = -2; dy \u003c= 2; dy++) {\n        for (let dx = -2; dx \u003c= 2; dx++) fijo(cx + dx, cy + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);\n      }\n    }));\n  }\n  const formato = (mascara) => {\n    let r = mascara;\n    for (let i = 0; i \u003c 10; i++) r = (r \u003c\u003c 1) ^ ((r >>> 9) * 0x537);\n    const b = ((mascara \u003c\u003c 10) | r) ^ 0x5412;\n    const bit = (i) => (b >>> i) & 1;\n    for (let i = 0; i \u003c= 5; i++) fijo(8, i, bit(i));\n    fijo(8, 7, bit(6));\n    fijo(8, 8, bit(7));\n    fijo(7, 8, bit(8));\n    for (let i = 9; i \u003c 15; i++) fijo(14 - i, 8, bit(i));\n    for (let i = 0; i \u003c 8; i++) fijo(n - 1 - i, 8, bit(i));\n    for (let i = 8; i \u003c 15; i++) fijo(8, n - 15 + i, bit(i));\n    fijo(8, n - 8, 1);\n  };\n  formato(0);\n  if (ver >= 7) {\n    let r = ver;\n    for (let i = 0; i \u003c 12; i++) r = (r \u003c\u003c 1) ^ ((r >>> 11) * 0x1f25);\n    const b = (ver \u003c\u003c 12) | r;\n    for (let i = 0; i \u003c 18; i++) {\n      const a = n - 11 + (i % 3);\n      const c = Math.floor(i / 3);\n      const v = (b >>> i) & 1;\n      fijo(a, c, v);\n      fijo(c, a, v);\n    }\n  }\n\n  let i = 0;\n  for (let der = n - 1; der >= 1; der -= 2) {\n    if (der === 6) der = 5;\n    for (let v = 0; v \u003c n; v++) {\n      for (let j = 0; j \u003c 2; j++) {\n        const x = der - j;\n        const sube = ((der + 1) & 2) === 0;\n        const y = sube ? n - 1 - v : v;\n        if (!fn[y][x] && i \u003c flujo.length * 8) {\n          m[y][x] = (flujo[i >>> 3] >>> (7 - (i & 7))) & 1;\n          i++;\n        }\n      }\n    }\n  }\n\n  const aplicar = (q) => {\n    for (let y = 0; y \u003c n; y++) for (let x = 0; x \u003c n; x++) if (!fn[y][x] && QR_MASCARAS[q](x, y)) m[y][x] ^= 1;\n  };\n  let mejor = forzarMascara ?? 0;\n  if (forzarMascara === undefined) {\n    let minimo = Infinity;\n    for (let q = 0; q \u003c 8; q++) {\n      aplicar(q);\n      formato(q);\n      const p = qrPenalidad(m, n);\n      if (p \u003c minimo) { minimo = p; mejor = q; }\n      aplicar(q);\n    }\n  }\n  aplicar(mejor);\n  formato(mejor);\n  return { n, m, mascara: mejor };\n}\n\n// Devuelve el QR como SVG listo para insertar.\nexport function qrSvg(texto, color) {\n  const { n, m } = qrMatriz(texto);\n  const borde = 3;\n  let d = '';\n  for (let y = 0; y \u003c n; y++) {\n    for (let x = 0; x \u003c n; x++) {\n      if (!m[y][x]) continue;\n      let largo = 1;\n      while (x + largo \u003c n && m[y][x + largo]) largo++;\n      d += 'M' + (x + borde) + ' ' + (y + borde) + 'h' + largo + 'v1h-' + largo + 'z';\n      x += largo - 1;\n    }\n  }\n  const lado = n + borde * 2;\n  return '\u003csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 ' + lado + ' ' + lado + '\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Código QR\">'\n    + '\u003crect width=\"' + lado + '\" height=\"' + lado + '\" fill=\"#fff\"/>\u003cpath d=\"' + d + '\" fill=\"' + (color || '#1B1F21') + '\"/>\u003c/svg>';\n}\n"}</script>
+<script>
+(function(){
+'use strict';
+// ---- zip.mjs ----
+// Abre un .pptx (que por dentro es un zip) sin dependencias.
+// Funciona igual en el navegador y en Node 20.12 o superior.
+async function abrirZip(datos) {
+  const b = datos instanceof Uint8Array ? datos : new Uint8Array(datos);
+  const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  let fin = -1;
+  for (let i = b.length - 22; i >= Math.max(0, b.length - 65557); i--) {
+    if (v.getUint32(i, true) === 0x06054b50) { fin = i; break; }
+  }
+  if (fin < 0) throw new Error('El archivo no parece un .pptx: no se pudo abrir.');
+  const total = v.getUint16(fin + 10, true);
+  let p = v.getUint32(fin + 16, true);
+  const dec = new TextDecoder();
+  const entradas = new Map();
+  for (let n = 0; n < total; n++) {
+    if (p + 46 > b.length || v.getUint32(p, true) !== 0x02014b50) break;
+    const metodo = v.getUint16(p + 10, true);
+    const comprimido = v.getUint32(p + 20, true);
+    const largoNombre = v.getUint16(p + 28, true);
+    const largoExtra = v.getUint16(p + 30, true);
+    const largoComentario = v.getUint16(p + 32, true);
+    const local = v.getUint32(p + 42, true);
+    const nombre = dec.decode(b.subarray(p + 46, p + 46 + largoNombre));
+    entradas.set(nombre, { metodo, comprimido, local });
+    p += 46 + largoNombre + largoExtra + largoComentario;
+  }
+
+  async function bytes(nombre) {
+    const e = entradas.get(nombre);
+    if (!e) return null;
+    const inicio = e.local + 30 + v.getUint16(e.local + 26, true) + v.getUint16(e.local + 28, true);
+    const crudo = b.subarray(inicio, inicio + e.comprimido);
+    if (e.metodo === 0) return crudo;
+    if (e.metodo !== 8) throw new Error('Compresión no soportada en ' + nombre);
+    const flujo = new Blob([crudo]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(flujo).arrayBuffer());
+  }
+
+  return {
+    nombres: [...entradas.keys()],
+    tiene: (nombre) => entradas.has(nombre),
+    bytes,
+    texto: async (nombre) => {
+      const x = await bytes(nombre);
+      return x ? dec.decode(x) : null;
+    },
+  };
+}
+
+// ---- xml.mjs ----
+// Lector de XML mínimo: alcanza para los archivos de un .pptx y no depende del navegador.
+const ENTIDADES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+
+function desescapar(t) {
+  if (t.indexOf('&') < 0) return t;
+  return t.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (todo, e) => {
+    if (e[0] !== '#') return ENTIDADES[e] ?? todo;
+    const hex = e[1] === 'x' || e[1] === 'X';
+    return String.fromCodePoint(parseInt(e.slice(hex ? 2 : 1), hex ? 16 : 10));
+  });
+}
+
+function leerXml(txt) {
+  const raiz = { n: '#raiz', a: {}, c: [], t: '' };
+  const pila = [raiz];
+  const re = /<\!--[\s\S]*?-->|<!\[CDATA\[([\s\S]*?)\]\]>|<\?[\s\S]*?\?>|<!DOCTYPE[^>]*>|<\/([^\s>]+)\s*>|<([^\s>\/]+)((?:\s+[^\s=>\/]+\s*=\s*(?:"[^"]*"|'[^']*'))*)\s*(\/?)>|([^<]+)/g;
+  let m;
+  while ((m = re.exec(txt))) {
+    const arriba = pila[pila.length - 1];
+    if (m[1] !== undefined) arriba.t += m[1];
+    else if (m[2]) { if (pila.length > 1) pila.pop(); }
+    else if (m[3]) {
+      const nodo = { n: m[3], a: {}, c: [], t: '' };
+      if (m[4]) {
+        const ra = /([^\s=]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
+        let x;
+        while ((x = ra.exec(m[4]))) nodo.a[x[1]] = desescapar(x[2] ?? x[3]);
+      }
+      arriba.c.push(nodo);
+      if (!m[5]) pila.push(nodo);
+    } else if (m[6]) arriba.t += desescapar(m[6]);
+  }
+  return raiz;
+}
+
+const hijos = (n, nombre) => (n ? n.c.filter((x) => x.n === nombre) : []);
+const hijo = (n, nombre) => (n ? n.c.find((x) => x.n === nombre) : undefined);
+
+function ruta(n, ...nombres) {
+  for (const x of nombres) {
+    n = hijo(n, x);
+    if (!n) return undefined;
+  }
+  return n;
+}
+
+function todos(n, nombre, salida = []) {
+  if (!n) return salida;
+  for (const x of n.c) {
+    if (x.n === nombre) salida.push(x);
+    todos(x, nombre, salida);
+  }
+  return salida;
+}
+
+// ---- pptx.mjs ----
+// Lee un .pptx y devuelve su contenido como datos simples:
+// { titulo, colores, diapositivas: [{ n, titulo, subtitulo, items, imagenes, tablas, notas, seccion, disposicion }], avisos }
+
+const TIPOS_IMAGEN = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', svg: 'image/svg+xml', webp: 'image/webp', bmp: 'image/bmp' };
+const TITULO_GENERICO = /^(presentaci[oó]n( de powerpoint)?|powerpoint presentation|diapositiva \d+|slide \d+|untitled|sin t[ií]tulo)$/i;
+
+function escaparHtml(t) {
+  return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function aBase64(b) {
+  if (typeof Buffer !== 'undefined') return Buffer.from(b.buffer, b.byteOffset, b.byteLength).toString('base64');
+  let s = '';
+  for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+function resolverRuta(base, destino) {
+  if (destino.startsWith('/')) return destino.slice(1);
+  const partes = base.split('/');
+  partes.pop();
+  for (const s of destino.split('/')) {
+    if (s === '..') partes.pop();
+    else if (s !== '.') partes.push(s);
+  }
+  return partes.join('/');
+}
+
+async function relacionesDe(zip, archivo) {
+  const carpeta = archivo.replace(/[^/]+$/, '');
+  const txt = await zip.texto(carpeta + '_rels/' + archivo.slice(carpeta.length) + '.rels');
+  const mapa = {};
+  if (!txt) return mapa;
+  for (const r of todos(leerXml(txt), 'Relationship')) {
+    const externo = r.a.TargetMode === 'External';
+    mapa[r.a.Id] = { tipo: String(r.a.Type || '').split('/').pop(), destino: externo ? r.a.Target : resolverRuta(archivo, r.a.Target), externo };
+  }
+  return mapa;
+}
+
+// Párrafos de un cuadro de texto: nivel de sangría, texto plano y HTML con negritas y cursivas.
+function parrafosDe(txBody) {
+  const salida = [];
+  for (const p of hijos(txBody, 'a:p')) {
+    let html = '';
+    let texto = '';
+    let tam = 0;
+    let negrita = 0;
+    let largo = 0;
+    for (const r of p.c) {
+      if (r.n === 'a:br') { html += '<br>'; texto += ' '; continue; }
+      if (r.n !== 'a:r' && r.n !== 'a:fld') continue;
+      const t = hijo(r, 'a:t')?.t ?? '';
+      if (!t) continue;
+      const pr = hijo(r, 'a:rPr')?.a ?? {};
+      let h = escaparHtml(t);
+      if (pr.i === '1') h = '<i>' + h + '</i>';
+      if (pr.b === '1') { h = '<b>' + h + '</b>'; negrita += t.trim().length; }
+      if (pr.sz) tam = Math.max(tam, +pr.sz);
+      html += h;
+      texto += t;
+      largo += t.trim().length;
+    }
+    texto = texto.replace(/\s+/g, ' ').trim();
+    if (!texto) continue;
+    html = html.replace(/<\/b>(\s*)<b>/g, '$1').replace(/^(<br>)+|(<br>)+$/g, '').trim();
+    // Si todo el párrafo está en negrita es un estilo, no un énfasis.
+    if (negrita >= largo) html = html.replace(/<\/?b>/g, '');
+    const pp = hijo(p, 'a:pPr');
+    salida.push({ nivel: +(pp?.a.lvl || 0), html, texto, tam });
+  }
+  return salida;
+}
+
+function cajaDe(n) {
+  const x = ruta(n, 'p:spPr', 'a:xfrm') || hijo(n, 'p:xfrm');
+  const off = hijo(x, 'a:off');
+  const ext = hijo(x, 'a:ext');
+  return { x: +(off?.a.x ?? 0), y: +(off?.a.y ?? 0), w: +(ext?.a.cx ?? 0), h: +(ext?.a.cy ?? 0) };
+}
+
+function recorrerFormas(arbol, f) {
+  if (!arbol) return;
+  for (const n of arbol.c) {
+    if (n.n === 'p:grpSp') recorrerFormas(n, f);
+    else if (n.n === 'mc:AlternateContent') recorrerFormas(hijo(n, 'mc:Fallback') || hijo(n, 'mc:Choice'), f);
+    else f(n);
+  }
+}
+
+const unir = (pars) => ({ html: pars.map((p) => p.html).join('<br>'), texto: pars.map((p) => p.texto).join(' ') });
+
+async function leerDiapositiva(zip, archivo, ctx) {
+  const txt = await zip.texto(archivo);
+  const sld = txt ? hijo(leerXml(txt), 'p:sld') : null;
+  if (!sld || sld.a.show === '0') return null;
+  const rels = await relacionesDe(zip, archivo);
+  const d = { titulo: null, subtitulo: null, items: [], imagenes: [], tablas: [], notas: '', disposicion: '', avisos: [] };
+  const cuerpos = [];
+  const sueltos = [];
+  const fotos = [];
+
+  recorrerFormas(ruta(sld, 'p:cSld', 'p:spTree'), (n) => {
+    if (n.n === 'p:sp') {
+      const ph = ruta(n, 'p:nvSpPr', 'p:nvPr', 'p:ph');
+      const tipo = ph ? ph.a.type || 'body' : '';
+      if (['dt', 'ftr', 'sldNum', 'hdr'].includes(tipo)) return;
+      const pars = parrafosDe(hijo(n, 'p:txBody'));
+      if (!pars.length) return;
+      if ((tipo === 'title' || tipo === 'ctrTitle') && !d.titulo) d.titulo = unir(pars);
+      else if (tipo === 'subTitle' && !d.subtitulo) d.subtitulo = unir(pars);
+      else if (ph) cuerpos.push(pars);
+      else sueltos.push({ caja: cajaDe(n), pars, tam: Math.max(...pars.map((p) => p.tam)) });
+    } else if (n.n === 'p:pic') {
+      fotos.push(n);
+    } else if (n.n === 'p:graphicFrame') {
+      const tabla = todos(n, 'a:tbl')[0];
+      if (tabla) {
+        d.tablas.push(hijos(tabla, 'a:tr').map((tr) => hijos(tr, 'a:tc').map((tc) => parrafosDe(hijo(tc, 'a:txBody')).map((p) => p.html).join('<br>'))));
+      } else if (todos(n, 'c:chart').length) {
+        d.avisos.push('tiene un gráfico que no se pudo convertir. Pegalo como imagen en el PowerPoint y volvé a convertir.');
+      } else if (todos(n, 'dgm:relIds').length) {
+        d.avisos.push('tiene un SmartArt que no se pudo convertir. Pasalo a texto o pegalo como imagen.');
+      }
+    }
+  });
+
+  // Presentaciones hechas en Canva o Google Slides no usan marcadores: el título es el texto más grande.
+  if (!d.titulo && sueltos.length) {
+    const conTam = sueltos.filter((s) => s.tam > 0);
+    const candidato = conTam.length
+      ? conTam.reduce((a, b) => (b.tam > a.tam ? b : a))
+      : sueltos.reduce((a, b) => (b.caja.y < a.caja.y ? b : a));
+    const texto = candidato.pars.map((p) => p.texto).join(' ');
+    if (texto.length <= 160 && candidato.pars.length <= 3) {
+      d.titulo = unir(candidato.pars);
+      sueltos.splice(sueltos.indexOf(candidato), 1);
+    }
+  }
+  sueltos.sort((a, b) => (Math.abs(a.caja.y - b.caja.y) > 200000 ? a.caja.y - b.caja.y : a.caja.x - b.caja.x));
+  for (const pars of cuerpos) d.items.push(...pars);
+  for (const s of sueltos) d.items.push(...s.pars);
+
+  for (const n of fotos) {
+    const rel = rels[ruta(n, 'p:blipFill', 'a:blip')?.a['r:embed']];
+    if (!rel || rel.externo) continue;
+    const caja = cajaDe(n);
+    const area = caja.w && caja.h ? (caja.w * caja.h) / (ctx.ancho * ctx.alto) : 1;
+    if (todos(hijo(n, 'p:nvPicPr'), 'a:videoFile').length) d.avisos.push('tiene un video: en el HTML queda solo su imagen de portada.');
+    if (area < 0.012) continue; // íconos y logos chicos de la plantilla
+    const ext = rel.destino.split('.').pop().toLowerCase();
+    const mime = TIPOS_IMAGEN[ext];
+    if (!mime) {
+      d.avisos.push('tiene una imagen en formato .' + ext + ' que el navegador no muestra. Guardala como PNG y volvé a convertir.');
+      continue;
+    }
+    const bytes = await zip.bytes(rel.destino);
+    if (bytes) d.imagenes.push({ src: 'data:' + mime + ';base64,' + aBase64(bytes), area, proporcion: caja.h ? caja.w / caja.h : 0 });
+  }
+  d.imagenes.sort((a, b) => b.area - a.area);
+
+  const relNotas = Object.values(rels).find((r) => r.tipo === 'notesSlide');
+  const xmlNotas = relNotas ? await zip.texto(relNotas.destino) : null;
+  if (xmlNotas) {
+    const partes = [];
+    recorrerFormas(ruta(hijo(leerXml(xmlNotas), 'p:notes'), 'p:cSld', 'p:spTree'), (n) => {
+      if (n.n === 'p:sp' && ruta(n, 'p:nvSpPr', 'p:nvPr', 'p:ph')?.a.type === 'body') {
+        partes.push(...parrafosDe(hijo(n, 'p:txBody')).map((p) => p.texto));
+      }
+    });
+    d.notas = partes.join('\n');
+  }
+
+  const relDisp = Object.values(rels).find((r) => r.tipo === 'slideLayout');
+  if (relDisp) {
+    if (!ctx.disposiciones.has(relDisp.destino)) {
+      const x = await zip.texto(relDisp.destino);
+      ctx.disposiciones.set(relDisp.destino, x ? hijo(leerXml(x), 'p:sldLayout')?.a.type || '' : '');
+    }
+    d.disposicion = ctx.disposiciones.get(relDisp.destino);
+  }
+  return d;
+}
+
+async function leerPptx(datos, nombreArchivo) {
+  const zip = await abrirZip(datos);
+  const xmlPres = await zip.texto('ppt/presentation.xml');
+  if (!xmlPres) throw new Error('El archivo no es una presentación .pptx. Si es .ppt, Keynote o Google Slides, exportalo como .pptx.');
+  const pres = hijo(leerXml(xmlPres), 'p:presentation');
+  const rels = await relacionesDe(zip, 'ppt/presentation.xml');
+  const tam = hijo(pres, 'p:sldSz');
+  const ctx = { ancho: +(tam?.a.cx || 12192000), alto: +(tam?.a.cy || 6858000), disposiciones: new Map() };
+
+  const secciones = new Map();
+  for (const s of todos(pres, 'p14:section')) {
+    for (const id of todos(s, 'p14:sldId')) secciones.set(id.a.id, s.a.name || '');
+  }
+
+  const modelo = { titulo: '', colores: null, diapositivas: [], avisos: [] };
+  for (const id of hijos(hijo(pres, 'p:sldIdLst'), 'p:sldId')) {
+    const rel = rels[id.a['r:id']];
+    const d = rel ? await leerDiapositiva(zip, rel.destino, ctx) : null;
+    if (!d) continue;
+    d.n = modelo.diapositivas.length + 1;
+    d.seccion = secciones.get(id.a.id) || '';
+    for (const a of d.avisos) modelo.avisos.push('Diapositiva ' + d.n + ': ' + a);
+    delete d.avisos;
+    modelo.diapositivas.push(d);
+  }
+  if (!modelo.diapositivas.length) throw new Error('La presentación no tiene diapositivas visibles.');
+  // Una sola sección es la que PowerPoint crea por defecto: no aporta nada.
+  if (new Set(modelo.diapositivas.map((d) => d.seccion)).size <= 1) modelo.diapositivas.forEach((d) => { d.seccion = ''; });
+
+  const core = await zip.texto('docProps/core.xml');
+  const tituloDoc = core ? (todos(leerXml(core), 'dc:title')[0]?.t || '').trim() : '';
+  modelo.titulo = (tituloDoc && !TITULO_GENERICO.test(tituloDoc) ? tituloDoc : '')
+    || modelo.diapositivas[0].titulo?.texto
+    || String(nombreArchivo || 'Presentación').replace(/\.pptx$/i, '');
+
+  const relTema = Object.values(rels).find((r) => r.tipo === 'theme');
+  const xmlTema = relTema ? await zip.texto(relTema.destino) : null;
+  if (xmlTema) {
+    const esquema = todos(leerXml(xmlTema), 'a:clrScheme')[0];
+    const color = (nombre) => {
+      const c = hijo(esquema, nombre);
+      const v = hijo(c, 'a:srgbClr')?.a.val || hijo(c, 'a:sysClr')?.a.lastClr;
+      return v ? '#' + v.toUpperCase() : null;
+    };
+    const c1 = color('a:accent1');
+    if (c1) modelo.colores = [c1, color('a:accent2') || c1];
+  }
+  return modelo;
+}
+
+// ---- armar.mjs ----
+// Arma la presentación HTML (un solo archivo) a partir del contenido leído del .pptx.
+
+const RE_VOTO = /^\s*(votar|voto|votaci[oó]n|encuesta|poll|vote)\s*[:：]\s*/i;
+const RE_NUBE = /^\s*(nube|palabras|cloud|wordcloud)\s*[:：]\s*/i;
+const RE_PREGUNTAS = /^\s*(preguntas\s*[:：].*|[¿¡]?\s*(preguntas( y respuestas)?|consultas|dudas|q\s*&\s*a|questions)\s*[?!]*)\s*$/i;
+const RE_NUMERO = /^([^\d]{0,4})(\d[\d.,]*)(\s?[^\d\s].{0,7})?$/;
+const LETRAS = 'ABCDEFGHIJ';
+
+function huella(t) {
+  let h = 5381;
+  for (let i = 0; i < t.length; i++) h = ((h * 33) ^ t.charCodeAt(i)) >>> 0;
+  return h.toString(36).padStart(6, '0').slice(-6);
+}
+
+function rgbDe(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim());
+  if (!m) return null;
+  const v = parseInt(m[1], 16);
+  let c = [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+  // Un color muy claro no se lee sobre blanco: se oscurece hasta que tenga contraste.
+  const luz = (x) => (0.2126 * x[0] + 0.7152 * x[1] + 0.0722 * x[2]) / 255;
+  while (luz(c) > 0.62) c = c.map((x) => Math.round(x * 0.88));
+  return c;
+}
+const aHex = (c) => '#' + c.map((x) => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+// Título con una parte destacada, como en la charla original: las negritas del PowerPoint mandan;
+// si no hay, se destaca el final de la frase.
+function tituloHtml(t) {
+  if (!t) return '';
+  const html = t.html.replace(/<br>/g, ' ').replace(/<\/?i>/g, '');
+  if (/<b>/.test(html)) return html.replace(/<b>/g, '<span class="grad">').replace(/<\/b>/g, '</span>');
+  const txt = t.texto;
+  const corte = /^(.*[,:;–—])\s+([^,:;–—]+)$/.exec(txt);
+  if (corte && corte[1].length > 3 && corte[2].split(' ').length <= 6) {
+    return escaparHtml(corte[1]) + ' <span class="grad">' + escaparHtml(corte[2]) + '</span>';
+  }
+  const palabras = txt.split(' ');
+  if (palabras.length < 2) return '<span class="grad">' + escaparHtml(txt) + '</span>';
+  const k = palabras.length >= 4 ? 2 : 1;
+  return escaparHtml(palabras.slice(0, -k).join(' ')) + ' <span class="grad">' + escaparHtml(palabras.slice(-k).join(' ')) + '</span>';
+}
+
+function tamTitulo(texto) {
+  const l = (texto || '').length;
+  return l <= 34 ? ' xl' : l <= 80 ? '' : l <= 130 ? ' s' : ' xs';
+}
+
+// Agrupa los párrafos en puntos principales con sus sub-puntos.
+function arbolDe(items) {
+  if (!items.length) return [];
+  const base = Math.min(...items.map((i) => i.nivel));
+  const salida = [];
+  for (const it of items) {
+    if (it.nivel <= base || !salida.length) salida.push({ ...it, hijos: [] });
+    else salida[salida.length - 1].hijos.push(it);
+  }
+  return salida;
+}
+
+function numeroDe(texto) {
+  const m = RE_NUMERO.exec(texto.trim());
+  if (!m || texto.trim().length > 16) return null;
+  const crudo = m[2].replace(/[.,]$/, '');
+  let valor;
+  let loc = 'es';
+  let dec = 0;
+  if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(crudo)) {
+    valor = parseFloat(crudo.replace(/\./g, '').replace(',', '.'));
+    dec = (crudo.split(',')[1] || '').length;
+  } else if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(crudo)) {
+    valor = parseFloat(crudo.replace(/,/g, ''));
+    dec = (crudo.split('.')[1] || '').length;
+    loc = 'en';
+  } else if (/^\d+([.,]\d+)?$/.test(crudo)) {
+    valor = parseFloat(crudo.replace(',', '.'));
+    dec = (crudo.split(/[.,]/)[1] || '').length;
+    loc = crudo.includes('.') ? 'en' : 'es';
+  } else return null;
+  if (!isFinite(valor)) return null;
+  return { antes: m[1] || '', despues: m[3] || '', valor, dec, loc, original: crudo };
+}
+
+function armarHtml(modelo, opciones, piezas) {
+  const o = { evento: '', vivo: false, api: '', pasos: true, colores: null, logo: '', notas: true, ...opciones };
+  const avisos = [...modelo.avisos];
+  const c1 = rgbDe(o.colores?.[0]) || [255, 51, 0];
+  const c2 = rgbDe(o.colores?.[1]) || (o.colores?.[0] ? c1 : [255, 153, 0]);
+  const tituloCharla = (o.titulo || modelo.titulo || 'Presentación').trim();
+  const idCharla = huella(tituloCharla + '|' + modelo.diapositivas.map((d) => d.titulo?.texto || '').join('|'));
+  const encuestas = {};
+  const resumen = { diapositivas: 0, votaciones: 0, nubes: 0, preguntas: 0 };
+  const secciones = [];
+  let nroSeccion = 0;
+  let pasosDe = 0;
+
+  // Clase y atributo de aparición: de a un clic (.f) o en cascada al entrar (.a).
+  const aparece = (i, conPasos) => {
+    if (conPasos) { pasosDe = Math.max(pasosDe, i); return ' f" data-f="' + i; }
+    return ' a d' + Math.min(i + 1, 6);
+  };
+
+  const unirse = (texto) => '<div class="unirse a d3"><div class="qrframe"><i></i><i></i><i></i><i></i><div class="qrimg" data-qr="sala"></div></div>'
+    + '<p class="live">' + texto + '</p><p class="url" data-url="sala"></p></div>';
+
+  // `angosto`: el texto comparte la diapositiva con una imagen, así que no hay lugar para tarjetas en fila.
+  function cuerpoPuntos(nodos, angosto) {
+    const conPasos = o.pasos && nodos.length >= 2 && nodos.length <= 8;
+    const largo = (n) => n.texto.length + n.hijos.reduce((a, h) => a + h.texto.length, 0);
+    const maximo = Math.max(...nodos.map(largo));
+    if (nodos.length === 1 && !nodos[0].hijos.length) return '<p class="parrafo a d2">' + nodos[0].html + '</p>';
+    if (angosto) {
+      // sigue a las variantes de filas o lista
+    } else if (nodos.length >= 2 && nodos.length <= 4 && nodos.every((n) => n.hijos.length) && maximo <= 260) {
+      return '<div class="grilla" style="--cols:' + nodos.length + '">' + nodos.map((n, i) =>
+        '<div class="card' + (nodos.length > 2 && i === nodos.length - 1 ? ' dark' : '') + aparece(i + 1, conPasos) + '"><div class="dot' + (i === nodos.length - 1 && nodos.length > 2 ? ' s' : '') + '">' + (i + 1) + '</div><h3>' + n.html + '</h3><ul>'
+        + n.hijos.map((h) => '<li>' + h.html + '</li>').join('') + '</ul></div>').join('') + '</div>';
+    }
+    else if (nodos.length >= 2 && nodos.length <= 3 && maximo <= 110 && nodos.every((n) => !n.hijos.length)) {
+      return '<div class="grilla" style="--cols:' + nodos.length + '">' + nodos.map((n, i) =>
+        '<div class="card' + aparece(i + 1, conPasos) + '"><div class="dot">' + (i + 1) + '</div><p class="grande">' + n.html + '</p></div>').join('') + '</div>';
+    }
+    if (nodos.length <= 6 && maximo <= 170) {
+      return '<div class="filas">' + nodos.map((n, i) =>
+        '<div class="fila' + aparece(i + 1, conPasos) + '"><div class="dot">' + (i + 1) + '</div><div><p class="ft">' + n.html + '</p>'
+        + (n.hijos.length ? '<p class="fs">' + n.hijos.map((h) => h.html).join(' · ') + '</p>' : '') + '</div></div>').join('') + '</div>';
+    }
+    const lineas = nodos.reduce((a, n) => a + 1 + n.hijos.length, 0);
+    return '<ul class="lista' + (lineas > 12 && !angosto ? ' dos-col' : '') + '">' + nodos.map((n, i) =>
+      '<li class="' + aparece(i + 1, conPasos).trim() + '">' + n.html
+      + (n.hijos.length ? '<ul>' + n.hijos.map((h) => '<li>' + h.html + '</li>').join('') + '</ul>' : '') + '</li>').join('') + '</ul>';
+  }
+
+  function tablaHtml(filas) {
+    const [cabeza, ...resto] = filas;
+    if (!resto.length) return '<table class="tabla a d2"><tbody><tr>' + cabeza.map((c) => '<td>' + c + '</td>').join('') + '</tr></tbody></table>';
+    return '<table class="tabla a d2"><thead><tr>' + cabeza.map((c) => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>'
+      + resto.map((f) => '<tr>' + f.map((c) => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
+  }
+
+  const fotosHtml = (imagenes, maximo) => {
+    const l = imagenes.slice(0, maximo);
+    return '<div class="fotos marco a d2" style="--cols:' + (l.length > 2 ? 2 : l.length) + '">' + l.map((im) => '<img src="' + im.src + '" alt="">').join('') + '</div>';
+  };
+
+  const secciones_html = modelo.diapositivas.map((d, indice) => {
+    pasosDe = 0;
+    const tituloTxt = d.titulo?.texto || '';
+    const nodos = arbolDe(d.items);
+    let clase = 'slide';
+    let extra = '';
+    let etiqueta = d.seccion || o.evento || tituloCharla;
+    let dentro = '';
+    let tituloVisible = tituloTxt;
+
+    const esVoto = RE_VOTO.test(tituloTxt);
+    const esNube = RE_NUBE.test(tituloTxt);
+    const esPreguntas = RE_PREGUNTAS.test(tituloTxt);
+    const limpio = tituloTxt.replace(RE_VOTO, '').replace(RE_NUBE, '').replace(/^\s*preguntas\s*[:：]\s*/i, '').trim();
+    const tituloLimpio = { html: escaparHtml(limpio), texto: limpio };
+    const cabeza = (t, tam) => '<div class="kicker" data-text="' + escaparHtml(etiqueta) + '"></div>'
+      + (t && t.texto ? '<h2 class="t' + (tam ?? tamTitulo(t.texto)) + '">' + tituloHtml(t) + '</h2>' : '');
+
+    if (o.vivo && esVoto && nodos.length >= 2) {
+      const id = idCharla + '-' + (indice + 1);
+      if (nodos.length > 10) avisos.push('Diapositiva ' + d.n + ': la votación tiene más de 10 opciones; se usan las primeras 10.');
+      encuestas[id] = { pregunta: limpio, ayuda: d.subtitulo?.texto || '', tipo: 'opciones', opciones: nodos.slice(0, 10).map((n, i) => ({ id: LETRAS[i], texto: n.texto.slice(0, 160) })) };
+      resumen.votaciones++;
+      clase += ' voto';
+      extra = ' data-encuesta="' + id + '"';
+      etiqueta = 'Votación en vivo';
+      tituloVisible = limpio;
+      dentro = '<canvas class="puntitos" width="1600" height="900"></canvas>' + cabeza(tituloLimpio)
+        + '<div class="cuerpo"><div class="in"><div class="envivo"><div class="zona a d2"><div class="tally" data-key="' + id + '"></div>'
+        + '<div class="total"><span class="live">EN VIVO</span><span><b data-total="' + id + '">0</b> <span data-plural="' + id + '">personas votaron</span></span></div></div>'
+        + unirse('ESCANEÁ Y VOTÁ') + '</div></div></div>';
+    } else if (o.vivo && esNube) {
+      const id = idCharla + '-' + (indice + 1);
+      encuestas[id] = { pregunta: limpio, ayuda: d.subtitulo?.texto || nodos[0]?.texto || 'Escribí tu respuesta y mirá la pantalla.', tipo: 'texto', opciones: [] };
+      resumen.nubes++;
+      clase += ' voto';
+      extra = ' data-encuesta="' + id + '"';
+      etiqueta = 'En vivo · Respondé desde el celular';
+      tituloVisible = limpio;
+      dentro = cabeza(tituloLimpio) + '<div class="cuerpo"><div class="in"><div class="envivo"><div class="zona a d2"><div class="nube" data-key="' + id + '"><div class="nubeVacia">Escribí tu respuesta en el celular y aparece acá</div></div>'
+        + '<div class="total"><span class="live">EN VIVO</span><span>Ya contestaron: <b data-total="' + id + '">0</b></span></div></div>'
+        + unirse('ESCANEÁ Y CONTESTÁ') + '</div></div></div>';
+    } else if (o.vivo && esPreguntas) {
+      resumen.preguntas++;
+      extra = ' data-momento="preguntas"';
+      etiqueta = 'Preguntas de la sala';
+      const t = limpio && !RE_PREGUNTAS.test(limpio) ? tituloLimpio : { html: '¿Preguntas?', texto: '¿Preguntas?' };
+      tituloVisible = t.texto;
+      dentro = cabeza(t, ' xl') + '<div class="cuerpo"><div class="in"><div class="envivo"><div class="zona a d2"><ol class="pregs"></ol>'
+        + '<p class="pregsVacia">Escribí tu pregunta desde el celular. Es anónima, y las más apoyadas aparecen acá.</p></div>'
+        + unirse('ESCANEÁ Y PREGUNTÁ') + '</div></div></div>';
+    } else {
+      // Sin modo en vivo, las diapositivas marcadas quedan como diapositivas comunes, sin el prefijo.
+      const t = esVoto || esNube ? tituloLimpio : d.titulo;
+      if (esVoto || esNube) tituloVisible = limpio;
+      const primero = nodos[0];
+      // Muchas plantillas marcan las secciones con un número solo ("01", "2"): eso es un separador.
+      const nroPropio = nodos.length === 1 && !nodos[0].hijos.length && !d.imagenes.length && /^\d{1,2}$/.test(nodos[0].texto.trim()) ? +nodos[0].texto.trim() : 0;
+      const soloTitulo = (!nodos.length || nroPropio) && !d.imagenes.length && !d.tablas.length;
+      const numero = nodos.length && nodos.length <= 2 && !nodos[0].hijos.length ? numeroDe(primero.texto) : null;
+      const esCita = nodos.length && nodos.length <= 2 && !d.imagenes.length && /^[“"«‘']/.test(primero.texto) && primero.texto.length > 20;
+
+      if (indice === 0 || d.disposicion === 'title' || d.disposicion === 'ctrTitle') {
+        clase += ' portada';
+        etiqueta = indice === 0 ? (o.evento || 'Presentación') : etiqueta;
+        const bajada = d.subtitulo?.html || nodos.map((n) => n.html).join(' · ');
+        dentro = '<canvas class="puntitos" width="1600" height="900"></canvas>'
+          + (d.imagenes.length ? '<img class="foto-portada a d2" src="' + d.imagenes[0].src + '" alt="">' : '<div class="adorno a d2"><i></i><i></i><i></i><b></b></div>')
+          + '<div class="kicker" data-text="' + escaparHtml(etiqueta) + '"></div>'
+          + '<h1 class="t' + (tituloTxt.length <= 48 ? '' : tituloTxt.length <= 90 ? ' s' : ' xs') + '">' + tituloHtml(t) + '</h1>'
+          + (bajada ? '<p class="sub a d3">' + bajada + '</p>' : '');
+      } else if (d.disposicion === 'secHead' || soloTitulo) {
+        clase += ' seccion';
+        nroSeccion = nroPropio || nroSeccion + 1;
+        dentro = '<div class="nro grad a">' + String(nroSeccion).padStart(2, '0') + '</div>'
+          + '<h2 class="t' + (tituloTxt.length <= 40 ? '' : tituloTxt.length <= 80 ? ' s' : ' xs') + '">' + tituloHtml(t) + '</h2>'
+          + (d.subtitulo || (nodos.length && !nroPropio) ? '<p class="sub a d3">' + (d.subtitulo?.html || nodos.map((n) => n.html).join(' · ')) + '</p>' : '');
+      } else if (esCita) {
+        dentro = cabeza(t) + '<div class="cuerpo"><div class="in"><div class="quote a d1">' + primero.html + '</div>'
+          + (nodos[1] ? '<p class="autor a d3">— ' + nodos[1].html.replace(/^[—–-]\s*/, '') + '</p>' : '') + '</div></div>';
+      } else if (numero) {
+        dentro = cabeza(t) + '<div class="cuerpo"><div class="in"><div class="big a d1">' + escaparHtml(numero.antes)
+          + '<span class="grad" data-count="' + numero.valor + '" data-dec="' + numero.dec + '" data-loc="' + numero.loc + '">' + escaparHtml(numero.original) + '</span>' + escaparHtml(numero.despues) + '</div>'
+          + (nodos[1] ? '<p class="parrafo a d3">' + nodos[1].html + '</p>' : d.subtitulo ? '<p class="parrafo a d3">' + d.subtitulo.html + '</p>' : '') + '</div></div>';
+      } else {
+        let cuerpo = '';
+        if (d.tablas.length) {
+          cuerpo = (nodos.length ? '<p class="parrafo a d1" style="margin-bottom:.7em">' + nodos.map((n) => n.html).join(' · ') + '</p>' : '') + d.tablas.map(tablaHtml).join('');
+        } else if (d.imagenes.length && nodos.length) {
+          cuerpo = '<div class="dos"><div class="col">' + cuerpoPuntos(nodos, true) + '</div>' + fotosHtml(d.imagenes, 2) + '</div>';
+        } else if (d.imagenes.length) {
+          cuerpo = fotosHtml(d.imagenes, 4);
+        } else {
+          cuerpo = cuerpoPuntos(nodos);
+        }
+        dentro = cabeza(t) + (d.subtitulo ? '<p class="sub a d1">' + d.subtitulo.html + '</p>' : '') + '<div class="cuerpo"><div class="in">' + cuerpo + '</div></div>';
+      }
+    }
+
+    const lineasTotales = d.items.length + d.tablas.reduce((a, t) => a + t.length, 0);
+    if (lineasTotales > 24) avisos.push('Diapositiva ' + d.n + ' («' + (tituloVisible || 'sin título').slice(0, 50) + '»): tiene ' + lineasTotales + ' líneas de texto y se va a ver muy chica. Conviene dividirla, o pegarla como imagen si es un diagrama.');
+    if (d.seccion && !secciones.includes(d.seccion)) secciones.push(d.seccion);
+    resumen.diapositivas++;
+    const notas = o.notas && d.notas ? ' data-notes="' + escaparHtml(d.notas) + '"' : '';
+    return '<section class="' + clase + '" data-titulo="' + escaparHtml(tituloVisible || 'Diapositiva ' + d.n) + '"' + (d.seccion ? ' data-seccion="' + escaparHtml(d.seccion) + '"' : '')
+      + (pasosDe ? ' data-steps="' + pasosDe + '"' : '') + extra + notas + '>\n' + dentro + '\n</section>';
+  });
+
+  const conVivo = o.vivo && (resumen.votaciones || resumen.nubes || resumen.preguntas);
+  if (o.vivo && !conVivo) {
+    avisos.push('Pediste el modo en vivo, pero ninguna diapositiva tiene un título que empiece con "VOTAR:", "NUBE:" o que sea "Preguntas". La presentación quedó sin votaciones.');
+  }
+  const config = { id: idCharla, titulo: tituloCharla, vivo: !!conVivo, api: String(o.api || '').trim().replace(/\/+$/, ''), encuestas };
+  const estiloColores = ':root{--c1:' + aHex(c1) + ';--c2:' + aHex(c2) + ';--c1-rgb:' + c1.join(',') + ';--c2-rgb:' + c2.join(',') + '}';
+  const quitarExport = (js) => js.replace(/^export\s+/gm, '');
+  const ayuda = '→ o espacio: avanzar · ←: volver · F: pantalla completa · N: notas · G: ir a · B: en blanco' + (conVivo ? ' · C: conexión' : '');
+
+  const panelVivo = conVivo ? `<div class="capa" id="cfg"><div class="box">
+  <h3>Modo en vivo</h3>
+  <p id="cfgEstado"></p>
+  <form id="cfgForm">
+    <label for="cfgUrl">Dirección de tu servidor</label>
+    <input id="cfgUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://mi-charla.vercel.app">
+    <div id="cfgEntrar"><label for="cfgPin">PIN del presentador</label>
+    <input id="cfgPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off"></div>
+    <div class="acts" style="justify-content:flex-start;margin-top:14px"><button class="btn" type="submit">Conectar</button><button class="btn ghost" id="cfgSalir" type="button">Desconectar</button><button class="btn ghost" id="retomar" type="button" style="display:none">Retomar el control</button></div>
+  </form>
+  <div class="cfgqr" id="cfgQrs"><figure><div class="qrimg" data-qr="control"></div><figcaption>Tu control remoto: escanealo antes de conectar el proyector.<br><span data-url="control"></span></figcaption></figure><figure><div class="qrimg" data-qr="sala"></div><figcaption>Para la sala.<br><span data-url="sala"></span></figcaption></figure></div>
+  <div class="acts"><button class="btn ghost" id="resetV" type="button">Limpiar todos los datos</button><button class="btn" id="cerrarCfg" type="button">Listo</button></div>
+</div></div>
+` : '';
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="joseii · github.com/chimichurria/joseii">
+<title>${escaparHtml(tituloCharla)}</title>
+<style>
+${piezas.css}
+${estiloColores}
+</style>
+</head>
+<body${conVivo ? ' class="sinapi"' : ''}>
+<div id="viewport"><div id="stage">
+<div class="gridbg"></div>
+<canvas id="bg"></canvas>
+<div class="glow g1"></div><div class="glow g2"></div>
+${secciones_html.join('\n')}
+<div class="foot"><span class="izq">${escaparHtml(o.evento || tituloCharla)}</span><span class="num" id="num" title="Ir a otra diapositiva"></span><span class="der">${conVivo ? '<button class="chipv off" id="chipVivo" type="button">Sin servidor</button>' : ''}${o.logo ? '<img src="' + o.logo + '" alt="">' : ''}</span></div>
+<div id="avisoRed">Sin conexión · conteo manual con + y −</div>
+</div></div>
+<div id="blanco"></div>
+<div id="prog"></div>
+<div id="notes"><div class="hd"><span id="nt"></span><span id="clock">00:00</span></div><div id="nx"></div><div id="nsig"></div></div>
+<div id="help">${ayuda}</div>
+<div class="capa" id="indice"><div class="box"><h3>Ir a…</h3><div id="indiceLista"></div></div></div>
+${panelVivo}<\script id="charla" type="application/json">${JSON.stringify(config).replace(/</g, '\\u003c')}<\/script>
+<\script>
+${conVivo ? quitarExport(piezas.qr) : ''}
+${piezas.js}
+<\/script>
+</body>
+</html>
+`;
+  return { html, avisos, resumen, config };
+}
+
+
+var PIEZAS=JSON.parse(document.getElementById('piezas').textContent);
+function $(i){return document.getElementById(i)}
+var modelo=null,nombre='',logo='',url=null,pendiente=null;
+
+function mostrarError(t){var e=$('error');e.textContent=t||'';e.classList.toggle('on',!!t)}
+function colores(){var v=document.querySelector('input[name=color]:checked').value;
+ if(v==='propio')return [$('color1').value,$('color2').value];
+ if(v==='ppt')return modelo&&modelo.colores?modelo.colores:null;
+ return null}
+function opciones(){return {evento:$('evento').value.trim(),vivo:$('vivo').checked,api:$('api').value.trim(),pasos:$('pasos').checked,notas:$('notas').checked,colores:colores(),logo:logo}}
+
+function convertir(){if(!modelo)return;var o=opciones();if(o.api&&!/^https?:\/\//i.test(o.api))o.api='https://'+o.api;
+ var r;try{r=armarHtml(modelo,o,PIEZAS)}catch(e){mostrarError('No se pudo armar la presentación: '+e.message);return}
+ mostrarError('');if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(new Blob([r.html],{type:'text/html;charset=utf-8'}));
+ var v=$('vista');v.hidden=false;v.src=url;$('vacio').hidden=true;
+ var d=$('descargar'),a=$('abrir');d.href=url;d.download=nombre.replace(/\.pptx$/i,'')+'.html';d.setAttribute('aria-disabled','false');a.href=url;a.setAttribute('aria-disabled','false');
+ var s=r.resumen,partes=[s.diapositivas+' diapositivas'];
+ if(r.config.vivo){if(s.votaciones)partes.push(s.votaciones+(s.votaciones===1?' votación':' votaciones'));if(s.nubes)partes.push(s.nubes+(s.nubes===1?' nube':' nubes'));if(s.preguntas)partes.push('preguntas de la sala')}
+ partes.push(Math.round(r.html.length/1024)+' KB');$('resumen').textContent=partes.join(' · ');
+ var avisos=r.avisos.slice();
+ if(document.querySelector('input[name=color]:checked').value==='ppt'&&!modelo.colores)avisos.push('No se encontraron colores en el tema de tu PowerPoint: se usa el naranja original.');
+ var ul=$('avisos');ul.textContent='';avisos.forEach(function(t){var li=document.createElement('li');li.textContent=t;ul.appendChild(li)});ul.classList.toggle('on',avisos.length>0)}
+function pronto(){clearTimeout(pendiente);pendiente=setTimeout(convertir,250)}
+
+function cargar(f){if(!f)return;if(!/\.pptx$/i.test(f.name)){mostrarError('Ese archivo no es .pptx. Si tenés un .ppt, Keynote o Google Slides, exportalo como PowerPoint (.pptx) y probá de nuevo.');return}
+ mostrarError('');nombre=f.name;$('archivoNombre').textContent='Leyendo '+f.name+'…';
+ f.arrayBuffer().then(function(b){return leerPptx(new Uint8Array(b),f.name)}).then(function(m){modelo=m;$('archivoNombre').textContent=f.name;convertir()})
+  .catch(function(e){modelo=null;$('archivoNombre').textContent='';mostrarError(e&&e.message?e.message:'No se pudo leer el archivo.')})}
+
+var zona=$('soltar'),entrada=$('archivo');
+zona.addEventListener('click',function(){entrada.click()});
+zona.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();entrada.click()}});
+entrada.addEventListener('change',function(){cargar(entrada.files[0]);entrada.value=''});
+['dragenter','dragover'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();zona.classList.add('sobre')})});
+['dragleave','drop'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();if(t==='drop'||e.relatedTarget===null)zona.classList.remove('sobre')})});
+document.addEventListener('drop',function(e){cargar(e.dataTransfer&&e.dataTransfer.files[0])});
+
+$('vivo').addEventListener('change',function(){$('vivoDetalle').classList.toggle('on',this.checked);convertir()});
+['pasos','notas','color1','color2'].forEach(function(i){$(i).addEventListener('change',convertir)});
+['evento','api'].forEach(function(i){$(i).addEventListener('input',pronto)});
+[].forEach.call(document.querySelectorAll('input[name=color]'),function(r){r.addEventListener('change',function(){$('colores').classList.toggle('on',r.value==='propio'&&r.checked);convertir()})});
+$('logoBoton').addEventListener('click',function(){$('logo').click()});
+$('logo').addEventListener('change',function(){var f=this.files[0];if(!f){return}if(f.size>600000){mostrarError('El logo pesa demasiado. Usá una imagen de menos de 600 KB.');return}
+ var lector=new FileReader();lector.onload=function(){logo=lector.result;$('logoNombre').textContent=f.name;convertir()};lector.readAsDataURL(f)});
+})();
+</script>
+</body>
+</html>

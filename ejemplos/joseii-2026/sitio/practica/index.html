@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex">
+<title>Tu turno · JoSEII</title>
+<style>
+:root{color-scheme:light;--red:#FF3300;--ora:#FF9900;--gray:#5f6a6e;--steel:#485458;--ink:#1B1F21;--line:#E4E7E8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:#fff;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;max-width:560px;margin:0 auto;padding:18px 18px 20px;padding:max(18px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.marca{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+.marca b{color:var(--red)}
+header a{display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:700;color:var(--steel);text-decoration:none}
+.pista{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin-bottom:24px}
+.pista i{display:block;height:100%;width:25%;border-radius:8px;background:linear-gradient(90deg,#FF3300,#FF9900);transition:width .3s ease}
+.num{font-size:14px;font-weight:700;letter-spacing:.06em;color:var(--red);margin-bottom:8px}
+h1{font-size:30px;line-height:1.14}
+.ayuda{font-size:17px;line-height:1.35;color:var(--gray);margin:10px 0 16px}
+main{flex:1}
+textarea{display:block;width:100%;min-height:150px;padding:14px 16px;border:2px solid var(--line);border-radius:16px;font:inherit;font-size:18px;line-height:1.35;color:var(--ink);background:#fff;resize:vertical}
+textarea:focus-visible,.boton:focus-visible{outline:3px solid rgba(255,51,0,.35);outline-offset:2px}
+textarea[readonly]{min-height:300px;background:#F7F8F8;font-size:16px}
+.aviso{min-height:24px;margin-top:10px;font-size:16px;font-weight:700;color:var(--red)}
+.acciones{display:flex;gap:10px;margin-top:14px}
+.boton{flex:1;min-height:56px;border-radius:16px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:17px;font-weight:700;color:var(--ink);cursor:pointer}
+.boton.pri{flex:2;border:0;background:linear-gradient(90deg,#FF3300,#FF9900);color:#fff}
+[hidden]{display:none}
+</style>
+</head>
+<body>
+<header><span class="marca">JoSEII <b>· Tu turno</b></span><a href="/">Volver a la charla</a></header>
+<div class="pista" aria-hidden="true"><i id="barra"></i></div>
+<main>
+  <section id="paso">
+    <p class="num" id="num"></p>
+    <h1 id="titulo" tabindex="-1"></h1>
+    <p class="ayuda" id="ayuda"></p>
+    <label for="texto" id="etiqueta" hidden></label>
+    <textarea id="texto" maxlength="300"></textarea>
+    <p class="aviso" id="aviso" role="status"></p>
+    <div class="acciones">
+      <button class="boton" id="atras" type="button">Atrás</button>
+      <button class="boton pri" id="seguir" type="button">Seguir</button>
+    </div>
+  </section>
+  <section id="final" hidden>
+    <p class="num">LISTO</p>
+    <h1 tabindex="-1" id="tituloFinal">Tu prompt está listo</h1>
+    <p class="ayuda">Copialo y pegalo en la IA que uses. Le estás pidiendo que primero te pregunte: eso es especificar.</p>
+    <label for="prompt" hidden>Tu prompt</label>
+    <textarea id="prompt" readonly></textarea>
+    <p class="aviso" id="avisoCopia" role="status"></p>
+    <div class="acciones">
+      <button class="boton" id="editar" type="button">Editar</button>
+      <button class="boton pri" id="copiar" type="button">Copiar mi prompt</button>
+    </div>
+  </section>
+</main>
+<script>
+(function(){
+var CLAVE='joseii-practica';
+var PASOS=[
+ {id:'problema',t:'¿Qué problema querés resolver?',a:'Uno real: de la facultad, del trabajo o de tu casa.',e:'Ej.: Pierdo tiempo buscando turno en el comedor de la facultad.'},
+ {id:'quien',t:'¿Para quién es?',a:'Pensá en una persona concreta, no en "todos".',e:'Ej.: Estudiantes que tienen 30 minutos entre clases.'},
+ {id:'afuera',t:'¿Qué queda afuera?',a:'Lo que esta vez no vas a resolver.',e:'Ej.: Pagos y cambios de menú.'},
+ {id:'verifica',t:'¿Cómo sabés que funciona?',a:'Algo que puedas comprobar.',e:'Ej.: Reservo un turno en menos de un minuto.'}
+];
+var datos={},i=0;
+function $(x){return document.getElementById(x)}
+function leer(){try{datos=JSON.parse(localStorage.getItem(CLAVE)||'{}')||{}}catch(e){datos={}}}
+function guardar(){try{localStorage.setItem(CLAVE,JSON.stringify(datos))}catch(e){}}
+function mostrar(){
+ var p=PASOS[i];$('paso').hidden=false;$('final').hidden=true;
+ $('barra').style.width=(25*(i+1))+'%';
+ $('num').textContent='PASO '+(i+1)+' DE '+PASOS.length;
+ $('titulo').textContent=p.t;$('etiqueta').textContent=p.t;$('ayuda').textContent=p.a;
+ $('texto').placeholder=p.e;$('texto').value=datos[p.id]||'';$('aviso').textContent='';
+ $('atras').style.visibility=i?'visible':'hidden';
+ $('seguir').textContent=i===PASOS.length-1?'Armar mi prompt':'Seguir';
+ $('titulo').focus();
+}
+function armar(){
+ return 'Actuá como analista de requisitos.\n\n'
+  +'Problema: '+datos.problema+'\n'
+  +'Para quién: '+datos.quien+'\n'
+  +'Queda afuera: '+datos.afuera+'\n'
+  +'Voy a saber que funciona cuando: '+datos.verifica+'\n\n'
+  +'Antes de proponer una solución, haceme hasta 3 preguntas sobre lo que falte o sea ambiguo. '
+  +'Cuando te responda, escribí una especificación breve con objetivo, alcance, supuestos, criterios de aceptación y riesgos. '
+  +'No escribas código todavía.';
+}
+function terminar(){
+ $('paso').hidden=true;$('final').hidden=false;$('barra').style.width='100%';
+ $('prompt').value=armar();$('avisoCopia').textContent='';$('tituloFinal').focus();window.scrollTo(0,0);
+}
+function seguir(){
+ var p=PASOS[i],v=$('texto').value.trim();
+ if(v.length<3){$('aviso').textContent='Escribí aunque sea una idea corta.';$('texto').focus();return}
+ datos[p.id]=v;guardar();
+ if(i<PASOS.length-1){i++;mostrar()}else terminar();
+}
+function copiaManual(){
+ var t=$('prompt'),ok=false;t.removeAttribute('readonly');t.focus();t.select();
+ try{t.setSelectionRange(0,t.value.length);ok=document.execCommand('copy')}catch(e){}
+ t.setAttribute('readonly','readonly');
+ $('avisoCopia').textContent=ok?'¡Copiado! Pegalo en tu IA.':'Tocá y mantené el texto para copiarlo.';
+}
+$('seguir').addEventListener('click',seguir);
+$('atras').addEventListener('click',function(){var p=PASOS[i];datos[p.id]=$('texto').value.trim();guardar();if(i>0){i--;mostrar()}});
+$('editar').addEventListener('click',function(){i=PASOS.length-1;mostrar()});
+$('copiar').addEventListener('click',function(){
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText($('prompt').value).then(function(){$('avisoCopia').textContent='¡Copiado! Pegalo en tu IA.'},copiaManual);
+ }else copiaManual();
+});
+leer();mostrar();
+})();
+</script>
+</body>
+</html>

@@ -10,11 +10,15 @@ Si querés, sumás el **modo en vivo, tipo Menti**: la sala escanea un QR y vota
 
 ## Empezar en 1 minuto
 
-1. Descargá [`index.html`](index.html) (botón **Download raw file** en GitHub) y abrilo en Chrome, Edge, Firefox o Safari.
-2. Arrastrá tu `.pptx`.
-3. Elegí las opciones y tocá **Descargar HTML**.
+**👉 [Abrí el conversor](https://chimichurria.github.io/joseii/)**
 
-Para probar sin un PowerPoint propio, usá [`ejemplos/demo.pptx`](ejemplos/demo.pptx). Así queda convertido: [`ejemplos/demo.html`](ejemplos/demo.html).
+1. Arrastrá tu `.pptx`.
+2. Elegí las opciones.
+3. Tocá **Descargar HTML**.
+
+Funciona también sin internet: descargá [`index.html`](index.html) (botón **Download raw file** en GitHub) y abrilo en Chrome, Edge, Firefox o Safari.
+
+Para probar sin un PowerPoint propio, usá [`ejemplos/demo.pptx`](ejemplos/demo.pptx). Así queda convertido: [mirá la demo](https://chimichurria.github.io/joseii/ejemplos/demo.html).
 
 ### Al presentar
 
